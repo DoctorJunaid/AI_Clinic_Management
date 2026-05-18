@@ -5,7 +5,17 @@ import toast from 'react-hot-toast';
 export const AuthContext = createContext();
 
 // Set base URL for axios
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+    return 'https://ai-clinic-management-iota.vercel.app';
+  }
+  return 'http://localhost:5000';
+};
+
+axios.defaults.baseURL = getBaseURL();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
