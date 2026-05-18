@@ -71,6 +71,7 @@ const Login = () => {
                 <input 
                   type="email" 
                   className="auth-input-field" 
+                  style={{ paddingLeft: '2.75rem' }}
                   placeholder="doctor@clinic.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -83,6 +84,7 @@ const Login = () => {
                 <input 
                   type="password" 
                   className="auth-input-field" 
+                  style={{ paddingLeft: '2.75rem' }}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

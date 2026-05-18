@@ -6,11 +6,11 @@ export const AuthContext = createContext();
 
 // Set base URL for axios
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
   if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
     return 'https://ai-clinic-management-iota.vercel.app';
+  }
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
   }
   return 'http://localhost:5000';
 };
