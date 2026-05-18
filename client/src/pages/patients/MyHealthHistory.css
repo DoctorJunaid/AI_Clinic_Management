@@ -1,0 +1,29 @@
+.patient-portal-container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.portal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.portal-list-item {
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--neutral-100);
+  transition: all 0.2s ease;
+}
+
+.portal-list-item:hover {
+  border-color: var(--brand-200);
+  background: var(--neutral-50);
+}
+
+@media (max-width: 768px) {
+  .portal-grid {
+    grid-template-columns: 1fr;
+  }
+}

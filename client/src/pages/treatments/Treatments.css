@@ -1,0 +1,139 @@
+.treatments-container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.treatments-grid-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: stretch;
+  margin-top: 1.5rem;
+}
+
+.prescription-history-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 200px);
+  background: var(--surface);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-2xl);
+  padding: 1.25rem;
+}
+
+.prescriptions-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.prescription-list-item {
+  padding: 1rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--neutral-100);
+  cursor: pointer;
+  background: var(--surface);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.prescription-list-item:hover {
+  background: var(--neutral-50);
+  border-color: var(--brand-100);
+  transform: translateY(-1px);
+}
+
+.prescription-list-item.active {
+  background: var(--brand-50);
+  border-color: var(--brand-300);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+}
+
+.prescription-viewer {
+  background: var(--surface);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-2xl);
+  padding: 1.5rem;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+.medicine-table-container {
+  overflow-x: auto;
+  border: 1px solid var(--neutral-100);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+}
+
+.medicine-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.medicine-table th {
+  background: var(--neutral-50);
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  color: var(--neutral-700);
+  border-bottom: 1px solid var(--neutral-100);
+}
+
+.medicine-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--neutral-100);
+  color: var(--neutral-600);
+}
+
+.medicine-table tr:last-child td {
+  border-bottom: none;
+}
+
+.input-field-sm {
+  width: 100%;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--neutral-200);
+  background: var(--surface);
+  color: var(--neutral-800);
+  transition: all 0.2s;
+}
+
+.input-field-sm:focus {
+  outline: none;
+  border-color: var(--brand-400);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.ai-response-box {
+  line-height: 1.6;
+}
+
+.medicine-row-card {
+  transition: all 0.2s;
+}
+
+.medicine-row-card:hover {
+  border-color: var(--brand-200);
+  background: var(--brand-50);
+  background-opacity: 0.2;
+}
+
+@media (max-width: 992px) {
+  .treatments-grid-layout {
+    grid-template-columns: 1fr;
+  }
+  .prescription-history-sidebar {
+    height: auto;
+    max-height: 300px;
+  }
+  .prescription-viewer {
+    height: auto;
+  }
+}

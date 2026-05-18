@@ -1,0 +1,88 @@
+.diagnosis-container {
+  padding: 1.5rem;
+  width: 100%;
+}
+
+.diagnosis-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.symptoms-presets-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.symptom-tag-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--neutral-200);
+  background: var(--surface);
+  color: var(--neutral-600);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.symptom-tag-btn:hover {
+  border-color: var(--brand-300);
+  background: var(--neutral-50);
+}
+
+.symptom-tag-btn.active {
+  background: var(--brand-500);
+  color: #fff;
+  border-color: var(--brand-500);
+}
+
+.empty-symptoms-placeholder {
+  background: var(--neutral-50);
+}
+
+.selected-symptom-badge {
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.05);
+}
+
+.test-item-card {
+  transition: all 0.2s;
+}
+
+.test-item-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--brand-200);
+}
+
+/* Risk classes */
+.risk-low {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.risk-medium {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.risk-high {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.risk-critical {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #9f1239;
+}
+
+@media (max-width: 992px) {
+  .diagnosis-grid-layout {
+    grid-template-columns: 1fr;
+  }
+}

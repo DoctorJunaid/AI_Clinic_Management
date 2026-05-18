@@ -1,0 +1,347 @@
+/* ──────────────────────────────────────────────
+   MEDI Premium Authentication CSS
+   ────────────────────────────────────────────── */
+
+.auth-viewport {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5e7eb;
+  padding: 2rem;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow: hidden;
+}
+
+/* Master canvas mimicking the design frame perfectly */
+.auth-canvas {
+  background: white;
+  width: 100%;
+  max-width: 1120px;
+  height: 680px;
+  border-radius: 2.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  display: grid;
+  grid-template-columns: 12fr 10fr;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .auth-viewport {
+    height: auto;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+  .auth-canvas {
+    grid-template-columns: 1fr;
+    height: auto;
+    border-radius: 1.5rem;
+  }
+}
+
+/* Left Pane Content */
+.auth-left-pane {
+  padding: 3.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  position: relative;
+  background: white;
+}
+
+@media (max-width: 1024px) {
+  .auth-left-pane {
+    padding: 2rem;
+    gap: 2rem;
+  }
+}
+
+/* MEDI Logo Branding */
+.auth-brand-logo {
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #000000;
+}
+
+.auth-brand-logo span {
+  color: #c8f17a;
+}
+
+/* Main Heading Area */
+.auth-hero-heading {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #111827;
+  max-width: 460px;
+}
+
+.auth-hero-heading span {
+  color: #c8f17a;
+}
+
+.auth-hero-sub {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  max-width: 440px;
+  margin-top: 1rem;
+}
+
+/* Compact form inputs */
+.auth-compact-form {
+  margin-top: 1.75rem;
+  max-width: 380px;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 1.25rem;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.auth-input-field {
+  width: 100%;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.875rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1f2937;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.auth-input-field:focus {
+  border-color: #000000;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px #000000;
+}
+
+/* Beautiful custom capsule sign in button */
+.auth-capsule-btn {
+  background: #000000;
+  color: #ffffff;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.75rem 2rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.auth-capsule-btn:hover {
+  background: #1f2937;
+  transform: translateY(-1px);
+}
+
+.auth-capsule-btn:active {
+  transform: translateY(0);
+}
+
+/* Service badges tags container */
+.auth-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 520px;
+}
+
+.auth-service-tag {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Right Pane Container with Inset Sizing */
+.auth-right-pane {
+  background: #f3f4f6;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+@media (max-width: 1024px) {
+  .auth-right-pane {
+    height: 480px;
+    padding: 1rem;
+  }
+}
+
+.auth-media-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 2rem;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.auth-media-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Curved social notch layout between panels */
+.auth-social-notch {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 40;
+}
+
+@media (max-width: 1024px) {
+  .auth-social-notch {
+    display: none;
+  }
+}
+
+.auth-notch-circle {
+  width: 2.75rem;
+  height: 2.75rem;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f2937;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #f3f4f6;
+}
+
+.auth-notch-circle:hover {
+  background: #f9fafb;
+  transform: scale(1.05);
+}
+
+/* Floating custom badges over the image */
+.auth-floating-badge {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.auth-badge-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background: #c8f17a;
+  color: #000000;
+  font-size: 0.65rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Custom positioning matching screen references */
+.auth-badge-expertise {
+  top: 2rem;
+  left: 2rem;
+}
+
+.auth-badge-wellness {
+  top: 35%;
+  left: 2rem;
+}
+
+.auth-badge-care {
+  bottom: 30%;
+  right: 2rem;
+}
+
+/* Heart rate visual block matching Stitch reference precisely */
+.auth-heartrate-card {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 1.5rem;
+  padding: 1.25rem;
+  width: 250px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.auth-heartrate-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #111827;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.auth-heartrate-chart {
+  height: 50px;
+  width: 100%;
+}
+
+.auth-heartrate-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #9ca3af;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 0.5rem;
+}
+
+.auth-heartrate-footer span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
