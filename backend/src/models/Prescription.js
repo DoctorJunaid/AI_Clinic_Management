@@ -16,10 +16,10 @@ const prescriptionSchema = new mongoose.Schema({
     ref: 'Appointment'
   },
   medicines: [{
-    name: { type: String, required: true },
-    dosage: { type: String, required: true },
-    frequency: { type: String, required: true },
-    duration: { type: String, required: true }
+    name: { type: String },
+    dosage: { type: String },
+    frequency: { type: String },
+    duration: { type: String }
   }],
   instructions: {
     type: String,

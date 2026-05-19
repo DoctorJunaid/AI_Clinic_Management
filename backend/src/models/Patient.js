@@ -26,6 +26,44 @@ const patientSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  vitals: {
+    heartRate: {
+      type: Number,
+      default: 72
+    },
+    bloodPressure: {
+      type: String,
+      default: '120/80'
+    },
+    bloodGlucose: {
+      type: Number,
+      default: 100
+    },
+    spo2: {
+      type: Number,
+      default: 98
+    },
+    temperature: {
+      type: Number,
+      default: 98.6
+    },
+    respiratoryRate: {
+      type: Number,
+      default: 16
+    }
+  },
+  scans: {
+    type: [{
+      name: { type: String, required: true },
+      url: { type: String, required: true },
+      date: { type: String, default: () => new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) }
+    }],
+    default: [
+      { name: 'Chest X-ray', url: 'https://images.unsplash.com/photo-1559757175-5700def837be?w=400&h=250&fit=crop', date: 'Oct 12' },
+      { name: 'MRI Brain', url: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400&h=250&fit=crop', date: 'Oct 12' },
+      { name: 'Abdominal CT', url: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=400&h=250&fit=crop', date: 'Oct 12' }
+    ]
+  },
   allergies: {
     type: [String],
     default: []
@@ -35,6 +73,10 @@ const patientSchema = new mongoose.Schema({
     default: ''
   },
   address: {
+    type: String,
+    required: [true, 'Please add an address']
+  },
+  avatar: {
     type: String,
     default: ''
   },

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MEDI - Patient Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&amp;family=Manrope:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#4e6e00",
+                      "on-primary-container": "#858383",
+                      "surface-tint": "#5f5e5e",
+                      "inverse-surface": "#2f3131",
+                      "on-tertiary-container": "#7e8b00",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#c8f17a",
+                      "primary-container": "#1c1b1b",
+                      "inverse-primary": "#c8c6c5",
+                      "secondary": "#496800",
+                      "on-secondary-fixed": "#131f00",
+                      "inverse-on-surface": "#f0f1f1",
+                      "surface-dim": "#dadada",
+                      "primary": "#000000",
+                      "on-tertiary-fixed": "#1a1e00",
+                      "surface-variant": "#e2e2e2",
+                      "on-background": "#1a1c1c",
+                      "surface-container-highest": "#e2e2e2",
+                      "primary-fixed-dim": "#c8c6c5",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#daee13",
+                      "surface-container-low": "#f3f3f4",
+                      "on-tertiary-fixed-variant": "#444b00",
+                      "on-surface-variant": "#444748",
+                      "on-surface": "#1a1c1c",
+                      "secondary-fixed-dim": "#add461",
+                      "secondary-fixed": "#c8f17a",
+                      "tertiary-container": "#1a1e00",
+                      "tertiary-fixed-dim": "#bfd100",
+                      "error": "#ba1a1a",
+                      "on-secondary": "#ffffff",
+                      "tertiary": "#000000",
+                      "surface-container-high": "#e8e8e8",
+                      "surface-bright": "#f9f9f9",
+                      "outline": "#747878",
+                      "background": "#f9f9f9",
+                      "outline-variant": "#c4c7c7",
+                      "on-primary-fixed": "#1c1b1b",
+                      "on-secondary-fixed-variant": "#364e00",
+                      "surface-container": "#eeeeee",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#474646",
+                      "surface": "#f9f9f9",
+                      "primary-fixed": "#e5e2e1",
+                      "error-container": "#ffdad6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-md": "24px",
+                      "gutter": "24px",
+                      "widget-gap": "16px",
+                      "margin-sm": "12px",
+                      "unit": "8px",
+                      "container-padding": "40px",
+                      "margin-lg": "48px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "body-md": [
+                              "Manrope"
+                      ],
+                      "nav-link": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "headline-lg": [
+                              "Plus Jakarta Sans"
+                      ],
+                      "label-sm": [
+                              "JetBrains Mono"
+                      ],
+                      "headline-xl": [
+                              "Plus Jakarta Sans"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "nav-link": [
+                              "14px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "40px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-xl": [
+                              "56px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { background-color: #f8f9fa; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .patient-selected {
+            background-color: #e8e8e8; /* surface-container-high approx */
+        }
+    </style>
+</head>
+<body class="text-on-surface font-body-md bg-background antialiased overflow-hidden h-screen flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-screen flex flex-col py-8 bg-surface-container-lowest border-r border-outline-variant/30 w-64 z-20">
+<div class="px-8 mb-12">
+<div class="font-headline-lg text-headline-lg font-black text-primary flex items-center gap-1 tracking-tight">
+                MEDI<span class="text-secondary text-2xl leading-none">.</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 mx-2 transition-colors hover:bg-surface-container-high/50 rounded-full font-nav-link text-nav-link tracking-wide" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 mx-2 transition-colors hover:bg-surface-container-high/50 rounded-full font-nav-link text-nav-link tracking-wide" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Appointments
+            </a>
+<a class="flex items-center gap-3 bg-secondary text-on-secondary rounded-full px-4 py-3 mx-2 font-nav-link text-nav-link tracking-wide opacity-90 transition-all duration-200 shadow-sm" href="#">
+<span class="material-symbols-outlined">person</span>
+                Patients
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 mx-2 transition-colors hover:bg-surface-container-high/50 rounded-full font-nav-link text-nav-link tracking-wide" href="#">
+<span class="material-symbols-outlined">group</span>
+                Staff
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 mx-2 transition-colors hover:bg-surface-container-high/50 rounded-full font-nav-link text-nav-link tracking-wide" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Analytics
+            </a>
+</div>
+<div class="mt-auto px-4 flex flex-col gap-4">
+<button class="w-full bg-secondary/90 hover:bg-secondary text-on-secondary py-3 px-4 rounded-full flex items-center justify-center gap-2 font-nav-link text-nav-link transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New Appointment
+            </button>
+<a class="flex items-center gap-3 text-on-surface-variant hover:text-primary px-4 py-3 transition-colors hover:bg-surface-container-high/50 rounded-full font-nav-link text-nav-link tracking-wide" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-64 flex flex-col h-screen">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-10 py-6 bg-surface-container-lowest border-b border-outline-variant/20 z-10 shrink-0">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full py-2.5 pl-12 pr-4 focus:ring-1 focus:ring-outline-variant text-body-md font-body-md placeholder:text-on-surface-variant/70" placeholder="Search" type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4 text-on-surface-variant">
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200">
+<span class="material-symbols-outlined">calendar_month</span>
+</button>
+<button class="hover:bg-surface-container-low p-2 rounded-full transition-colors duration-200 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full"></span>
+</button>
+</div>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant/20 cursor-pointer">
+<span class="font-nav-link text-nav-link text-on-surface">Muhammad Junaid</span>
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center font-bold text-sm text-on-surface-variant">
+                        MJ
+                    </div>
+<span class="material-symbols-outlined text-on-surface-variant">expand_more</span>
+</div>
+</div>
+</header>
+<!-- Main Layout Split -->
+<main class="flex-1 flex overflow-hidden">
+<!-- Left Panel: Patient List -->
+<div class="w-80 border-r border-outline-variant/20 bg-surface-container-lowest flex flex-col shrink-0">
+<div class="p-6 pb-4 flex justify-between items-center">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile tracking-tight">Patients</h2>
+<button class="w-8 h-8 rounded-full bg-secondary text-on-secondary flex items-center justify-center hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">add</span>
+</button>
+</div>
+<div class="px-6 pb-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-full py-2 pl-10 pr-4 focus:ring-1 focus:ring-secondary focus:border-secondary text-sm" placeholder="Search" type="text"/>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-4 py-2 space-y-1">
+<!-- Selected Patient -->
+<div class="flex items-center gap-4 p-3 rounded-xl patient-selected cursor-pointer">
+<img alt="Robert Wilson" class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a middle-aged male patient with short grey hair and a gentle smile, wearing a casual light blue button-down shirt. The background is a soft, studio grey. The lighting is clean and flattering, suitable for a medical profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALIDaqT_HFmxmNN-SqdhPI742kDW7N3vt0rsoZDB92JE8GlNiMR9lHFJKkPbz2XYi3XSMzo1Y8nPrCGl5uV0SntOwrM1lMbKZydgpHyPgKcGwHXcWK5hO7RZKjLaQEo5yNAXlvHLuX9ruhKc2uPKMYlG7FRhe9BEvdPlvgyxBFPbHjcVwfq3GYPKl5ddeobv9RhO0UNwupS80kGFH9UhNx91KsBgGfZNqo_m4vJ-Fe8hfTWQSMnRPn3gZAFv_U4XDMGxZpA6-cuXU"/>
+<div class="flex-1 min-w-0">
+<h4 class="font-semibold text-on-surface truncate text-sm">Robert Wilson</h4>
+<p class="text-on-surface-variant text-xs truncate">High-quality</p>
+</div>
+<div class="w-2.5 h-2.5 rounded-full bg-secondary"></div>
+</div>
+<!-- Other Patients -->
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-lowest cursor-pointer transition-colors">
+<img alt="Emily Davis" class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a young adult female patient with long brown hair, smiling softly. She is wearing a simple dark top. The background is a clean, neutral tone. The lighting is bright and even, ideal for a medical records profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPykGu8to1TAC1PYGz7z8DjOhGEmBks1SrLh-94mkrDRKZQJtFlKhOyf3mTnA4Z5JhFARl88d7GpDg8Pts3aQuwDHFrsNgnHJqkkf6rcPfrxODFX0mhR95GVfIp93SCgtBiCqMvkgGkeqM6e2__DaDx2rDq4CWsbMCuBmsh07gSJ4FQ0P4cqkaH_Z4wI_Av9WpqXlFFtZCAwBJ5w1HxqeYzwjsnXm6ye_PtwKdh1LJbsRjfRceVj2K8E2ICUgRQgoqCCXjHaeW0CQ"/>
+<div class="flex-1 min-w-0">
+<h4 class="font-medium text-on-surface truncate text-sm">Emily Davis</h4>
+<p class="text-on-surface-variant text-xs truncate">High-quality</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-lowest cursor-pointer transition-colors">
+<img alt="Michael Chen" class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a male patient in his thirties with short dark hair, looking directly at the camera with a neutral, pleasant expression. He wears a casual grey shirt. The background is a solid, light color. The lighting is crisp and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAndEdtUZRqlwgcdTCHbRWM3VqtHuH-R07SDcXR6IPDFbLGG4JWsStfQRFjSIbDzKywSSjG-M5SSlyZFSZsnlrtJ88bREAPp83f8FOZfgMx0fBjt1JtuFtle7DMv2pA4O904HEtdx6dY4Deix52CaMSEstZURt0OE3SAYeefc94LsPv9j8qktMG9Jp3Ej2T_fe96-97gxdcTUN1XAs1m6KjWpZvd9VxGWLK9EVjzlW9fMiddYHAowVi5KDvd2rRQDWVLqjBr700waY"/>
+<div class="flex-1 min-w-0">
+<h4 class="font-medium text-on-surface truncate text-sm">Michael Chen</h4>
+<p class="text-on-surface-variant text-xs truncate">High-quality</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-container-lowest cursor-pointer transition-colors">
+<img alt="Sarah Jenkins" class="w-12 h-12 rounded-full object-cover" data-alt="A professional headshot of a female patient in her late twenties with dark hair tied back, wearing a light-colored blouse. She has a friendly, approachable expression. The background is a soft, out-of-focus setting. The lighting is bright and warm." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDslTJ--80UaRGV8YPGtjrjbMyDld2YFJMJ3y4GNKJl5PNQMmk-t7VQF6eiagVRqBwN6bEl1MsgruF1FR4pb5B3voH2JCHcUL9kpcyVTfWg4fRJI6U5Cjgbi3aW0yfiBfbN7Ruvdb4Cvxv6VVBnHwioyzVYHbeboObUbGaeYn7ZF4NuKROHJG7FnhhPF1VTtSRwnO2NkWHq6uME-qwx4Mkx3eyXQ-dEvFwuaMkoPNLCZKypkNOlSiJsVRYAgiRCvairjClDdZ861zU"/>
+<div class="flex-1 min-w-0">
+<h4 class="font-medium text-on-surface truncate text-sm">Sarah Jenkins</h4>
+<p class="text-on-surface-variant text-xs flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary inline-block"></span> Active
+                            </p>
+</div>
+</div>
+</div>
+<!-- Promo/Info Widget -->
+<div class="m-6 p-4 rounded-xl bg-surface-container border border-outline-variant/30">
+<h5 class="font-nav-link text-xs tracking-wider text-on-surface mb-1">PRO PLAN</h5>
+<p class="text-xs text-on-surface-variant leading-relaxed">Get patient plans with your patient here.</p>
+</div>
+</div>
+<!-- Right Panel: Patient Profile Detail -->
+<div class="flex-1 overflow-y-auto bg-background p-10">
+<div class="max-w-5xl mx-auto space-y-8">
+<!-- Profile Header -->
+<div class="flex items-start gap-8">
+<img alt="Robert Wilson Large" class="w-32 h-32 rounded-full object-cover shadow-sm border-4 border-surface-container-lowest" data-alt="A large, high-resolution professional headshot of a middle-aged male patient with short grey hair and a gentle smile. He is wearing a casual light blue button-down shirt. The background is a soft, studio grey. The image is clean and bright, indicating a modern healthcare profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDaaJTpEt-yQBdpIl67gn6H6-itaGqVy_ey_tZ5XXebbACFmpYCUwBZmrDb2E1cdlCydpGQXTcyMCQUZ-snuo_at8zkjSiZBGfwbLfGRlNm4y0YTdRiWsB7Ey8_m3FPorXd6Jz2dPuvdjNVbhF3nQo8lr25ub0LMMYgs_BX1BkfCXysLgLdFzx7K69nbzb7YQczeZ5w1pYz-DtOIGsv0j4UimMkzfgR5k7L7OCc3WGSOKiKE62RCD5MBGy2KxFdxaNc342hYPtOHj8"/>
+<div class="flex-1 pt-2">
+<h1 class="font-headline-lg text-headline-lg tracking-tight mb-1">Robert Wilson</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-6">ID: #PT-09CSD4</p>
+<div class="flex flex-wrap gap-x-12 gap-y-4">
+<div>
+<p class="text-xs text-on-surface-variant mb-1">Gender</p>
+<p class="font-medium text-sm">Male</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant mb-1">Age</p>
+<p class="font-medium text-sm">52 years</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant mb-1">Phone</p>
+<p class="font-medium text-sm">555-0177</p>
+</div>
+<div>
+<p class="text-xs text-on-surface-variant mb-1">Allergies</p>
+<p class="font-medium text-sm text-error">Lactose</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Tabs -->
+<div class="border-b border-outline-variant/30 flex gap-8">
+<button class="pb-3 border-b-2 border-primary font-nav-link text-nav-link text-primary transition-colors">Overview</button>
+<button class="pb-3 border-b-2 border-transparent font-nav-link text-nav-link text-on-surface-variant hover:text-on-surface transition-colors">Appointments (1)</button>
+<button class="pb-3 border-b-2 border-transparent font-nav-link text-nav-link text-on-surface-variant hover:text-on-surface transition-colors">Clinical History (0)</button>
+</div>
+<!-- Tab Content: Overview -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Vitals -->
+<div class="lg:col-span-5 space-y-4">
+<!-- Heart Rate Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 shadow-sm relative overflow-hidden h-[180px]">
+<h3 class="text-on-surface font-medium mb-1 relative z-10">Heart Rate</h3>
+<div class="flex items-baseline gap-1 relative z-10">
+<span class="text-4xl font-bold tracking-tight">72</span>
+<span class="text-sm text-on-surface-variant font-medium">bpm</span>
+</div>
+<!-- Mock Graph -->
+<div class="absolute bottom-0 left-0 w-full h-24 pointer-events-none">
+<svg class="w-full h-full stroke-secondary fill-secondary/10" preserveaspectratio="none" viewbox="0 0 100 40">
+<path class="stroke-none" d="M0,30 Q10,25 20,28 T40,25 T60,15 T80,22 T100,5 L100,40 L0,40 Z"></path>
+<path d="M0,30 Q10,25 20,28 T40,25 T60,15 T80,22 T100,5" fill="none" stroke-width="1.5"></path>
+<circle class="fill-surface-container-lowest stroke-secondary" cx="20" cy="28" r="1.5" stroke-width="1"></circle>
+<circle class="fill-surface-container-lowest stroke-secondary" cx="40" cy="25" r="1.5" stroke-width="1"></circle>
+<circle class="fill-surface-container-lowest stroke-secondary" cx="60" cy="15" r="1.5" stroke-width="1"></circle>
+<circle class="fill-surface-container-lowest stroke-secondary" cx="80" cy="22" r="1.5" stroke-width="1"></circle>
+<circle class="fill-surface-container-lowest stroke-secondary" cx="100" cy="5" r="1.5" stroke-width="1"></circle>
+</svg>
+</div>
+</div>
+<!-- Blood Pressure Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 shadow-sm">
+<h3 class="text-on-surface font-medium mb-1">Blood Pressure</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-bold tracking-tight">120/80</span>
+<span class="text-sm text-on-surface-variant font-medium">mmHg</span>
+</div>
+</div>
+<!-- Blood Group Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/20 shadow-sm">
+<h3 class="text-on-surface font-medium mb-1">Blood Group</h3>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-bold tracking-tight">O-</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Scans -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/20 shadow-sm">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline-lg-mobile text-xl tracking-tight">Recent Diagnostic Scans</h3>
+<button class="text-secondary font-nav-link text-sm hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<!-- Scan Item -->
+<div class="group cursor-pointer">
+<div class="rounded-xl overflow-hidden mb-3 border border-outline-variant/20 bg-primary h-40 relative">
+<img alt="Chest X-ray" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity mix-blend-screen" data-alt="A medical chest X-ray image showing the rib cage and lungs. The image is strictly black and white, typical of radiographic imaging. It is displayed within a clean, modern user interface container with rounded corners." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAE5ISnGsiq9vcglE_vTsEcDBLXel4OW38xeenHs1ERy_XWiKCaqXJtBm9f0jbUm9cghyxJZrKaNQUAwplntk-bV3pzPvRvhJou7zp3msKnHa-FJIV_m3lMGb486A0ZVI_QUYr6ByHJr39Zzl9C76tIx1AscEeaeO8L9GUtq-fDLf90gapzvECnBgPRO5zi1etO3mavbyPPNAGpS_3Vg07dDf0gvRdCzjd07oiF3S0j65kDDv8RKdQu1vKydnXK1saBxUGtl6bzijA"/>
+</div>
+<h4 class="font-medium text-sm text-on-surface">Chest X-ray</h4>
+<p class="text-xs text-on-surface-variant">Oct 12</p>
+</div>
+<!-- Scan Item -->
+<div class="group cursor-pointer">
+<div class="rounded-xl overflow-hidden mb-3 border border-outline-variant/20 bg-primary h-40 relative">
+<img alt="MRI Scan" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity mix-blend-screen" data-alt="A detailed medical MRI scan of a human brain, viewed from an axial perspective. The image consists of varying shades of grey, characteristic of magnetic resonance imaging. It is framed within a modern digital medical interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYCvNBRQSaowve9mBfQTeUkvuY1I6ohHKh1N-r0X01TSqgKdixMElBaelxp00ck655-bzeyBYJEbJb8taDrykY2qNg5_HVgvkC3qH-8k1VlVbMuL6ypIDy9CM5-SKAjlXCjJeaaCYeu54uQRtNqmLFggngZWqprQGRrp43Gf0mxjHwEei-fCittaBiuocJu4bXVTZQnGPw_-xD44Qu09O6IlEH4k9KdQHmiydgaDYWFOYOpQsUsIX6laD10fLyyuJD_Hu66L72Zy8"/>
+</div>
+<h4 class="font-medium text-sm text-on-surface">MRI Brain</h4>
+<p class="text-xs text-on-surface-variant">Oct 12</p>
+</div>
+<!-- Scan Item -->
+<div class="group cursor-pointer">
+<div class="rounded-xl overflow-hidden mb-3 border border-outline-variant/20 bg-primary h-40 relative">
+<img alt="CT Scan" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity mix-blend-screen" data-alt="An axial slice of a CT scan showing the abdominal region, detailing internal organs like the liver and kidneys. The image is standard medical grayscale, presented neatly inside a rounded digital card format typical of modern medical software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAH3VesjcMEMfQ6DTxD9T8dn2zSuY6S31Xt_cCCsYe0TUCC_tdOm41ndJgedRuliQm4i-DcBIrzs_jWKGLC7Ukaa_BZHpxinBohKDhqSKylVs2F9JWmGL2ej4paFyI8EMeTcY1BKGu4cIx5r9emyPVGMWvM1naG8ZRn0JUOm2h2OURb1e0RooAHeaFWrXqSnAKQcWF2Nnx7mu3_BJCKitCBY0cbNCT5ihA7HVl-T0dV3XBwipo8dZUMXVjG2q762JqcDIhGe6cKb48"/>
+</div>
+<h4 class="font-medium text-sm text-on-surface">Abdominal CT</h4>
+<p class="text-xs text-on-surface-variant">Oct 12</p>
+</div>
+<!-- Upload Card -->
+<div class="rounded-xl border-2 border-dashed border-outline-variant/40 bg-surface-container-low flex flex-col items-center justify-center h-40 cursor-pointer hover:bg-surface-container hover:border-outline transition-colors group">
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary mb-2 text-[28px] transition-colors">upload</span>
+<span class="text-sm font-medium text-on-surface-variant group-hover:text-primary transition-colors">Upload New Scan</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

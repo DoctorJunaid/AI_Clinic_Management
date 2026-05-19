@@ -10,8 +10,10 @@ const AddPatientModal = ({ onClose, onSuccess }) => {
     age: '',
     gender: 'male',
     contact: '',
+    address: '',
     bloodGroup: '',
-    medicalHistory: ''
+    medicalHistory: '',
+    avatar: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -79,8 +81,20 @@ const AddPatientModal = ({ onClose, onSuccess }) => {
           </div>
 
           <div className="input-group col-span-2">
+            <label className="input-label">Residential Address</label>
+            <input type="text" className="input-field" required placeholder="e.g. 123 Main St, New York"
+              onChange={e => setFormData({...formData, address: e.target.value})} />
+          </div>
+
+          <div className="input-group col-span-2">
+            <label className="input-label">Patient Picture URL (Optional)</label>
+            <input type="url" className="input-field" placeholder="e.g. https://domain.com/pic.jpg"
+              onChange={e => setFormData({...formData, avatar: e.target.value})} />
+          </div>
+          
+          <div className="input-group col-span-2">
             <label className="input-label">Medical History</label>
-            <textarea className="input-field" rows="3" placeholder="Previous conditions..."
+            <textarea className="input-field" rows="2" placeholder="Previous conditions..."
               onChange={e => setFormData({...formData, medicalHistory: e.target.value})}></textarea>
           </div>
 

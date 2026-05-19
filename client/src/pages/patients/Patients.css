@@ -1,23 +1,47 @@
 /* ──────────────────────────────────────────────
-   Patients.css — Redesigned Premium Style Sheet
+   Patients.css — Overhauled Premium Stitch Layout
    ────────────────────────────────────────────── */
+
+:root {
+  --stitch-primary: #000000;
+  --stitch-secondary: #496800;
+  --stitch-secondary-light: #c8f17a;
+  --stitch-background: #f9f9f9;
+  --stitch-surface: #ffffff;
+  --stitch-surface-container: #eeeeee;
+  --stitch-surface-container-high: #e8e8e8;
+  --stitch-surface-container-low: #f3f3f4;
+  --stitch-outline-variant: rgba(196, 199, 199, 0.3);
+  --stitch-font-headline: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --stitch-font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+}
 
 .patient-module {
   display: flex;
-  gap: 1.75rem;
-  height: calc(100vh - var(--header-h) - 4.5rem);
+  gap: 1.5rem;
+  height: calc(100vh - 120px);
   padding: 0.25rem 0;
+  font-family: var(--stitch-font-body);
+  background-color: var(--stitch-background);
 }
 
-/* Left Sidebar list */
+/* Glass panel background */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Master Sidebar Drawer */
 .patient-list-sidebar {
-  width: 330px;
+  width: 320px;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: var(--stitch-surface);
   border-radius: 24px;
-  border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+  border: 2px solid var(--stitch-secondary-light) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
   overflow: hidden;
 }
 
@@ -26,9 +50,9 @@
 }
 
 .search-bar-small:focus-within {
-  border-color: #000000 !important;
+  border-color: var(--stitch-secondary) !important;
   background: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 0 3px rgba(73, 104, 0, 0.08);
 }
 
 .patients-scroll-list {
@@ -45,21 +69,29 @@
   border-radius: 4px;
 }
 
+/* Patient List Card Items */
 .patient-list-item {
   border: 1px solid transparent !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .patient-list-item:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  background-color: var(--stitch-surface-container-low) !important;
+  transform: translateY(-0.5px);
 }
 
-.patient-list-item.active {
-  background: #0f172a !important;
-  border-color: #0f172a !important;
+/* Stitch Selected state */
+.patient-list-item.patient-selected {
+  background-color: var(--stitch-surface-container-high) !important;
+  border-color: rgba(0, 0, 0, 0.04) !important;
 }
 
-/* Right longitudinal Workspace */
+.patient-list-item.patient-selected h4 {
+  font-weight: 700;
+  color: var(--stitch-primary) !important;
+}
+
+/* Right Detail longitudinal workspace */
 .patient-details-area {
   flex: 1;
   display: flex;
@@ -68,89 +100,75 @@
 }
 
 .patient-hero-banner {
-  border: 1px solid rgba(226, 232, 240, 0.8) !important;
-  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.03) !important;
-  background: #ffffff;
+  border: 1px solid var(--stitch-outline-variant) !important;
+  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.01) !important;
+  background: var(--stitch-surface);
+  border-radius: 24px;
 }
 
-/* Vitals and details cards */
-.details-content {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.05) transparent;
+.patient-hero-banner h2 {
+  font-family: var(--stitch-font-headline);
+  letter-spacing: -0.02em;
 }
 
-.details-content::-webkit-scrollbar {
-  width: 4px;
-}
-
-.details-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
+/* Tabs Section */
 .patient-tabs-row .tab {
   background: transparent;
   outline: none;
-  font-family: inherit;
+  font-family: var(--stitch-font-headline);
+  border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
 .patient-tabs-row .tab.active {
-  color: #000000 !important;
-  border-bottom-color: #000000 !important;
+  color: var(--stitch-primary) !important;
+  border-bottom-color: var(--stitch-primary) !important;
+  font-weight: 700;
 }
 
-/* Diagnostic radiology scans */
+/* Vitals Cards overrides */
+.vitals-grid-card {
+  transition: all 0.2s ease;
+  border: 1px solid var(--stitch-outline-variant);
+}
+
+.vitals-grid-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Diagnostic Scans with blend-mode screen overlay */
 .scan-img-box {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+  background-color: #000000;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-.scan-img-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.12);
-  border-color: #e2e8f0;
+.scan-img-box img {
+  mix-blend-mode: screen;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+}
+
+.scan-img-box:hover img {
+  opacity: 1.0;
+  transform: scale(1.03);
 }
 
 .scan-img-box.empty {
+  border: 2px dashed rgba(0, 0, 0, 0.15) !important;
   transition: all 0.2s ease;
 }
 
 .scan-img-box.empty:hover {
-  background: #f8fafc;
-  border-color: #cbd5e1;
-  color: #000000;
+  background: var(--stitch-surface-container-low);
+  border-color: var(--stitch-secondary) !important;
+  color: var(--stitch-primary);
 }
 
-/* Timeline steppers */
-.timeline-stack {
-  position: relative;
-}
-
-.timeline-item::before {
-  content: '';
-  position: absolute;
-  left: -31px;
-  top: 15px;
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background: #000000;
-  border: 2px solid #ffffff;
-  box-shadow: 0 0 0 4px #f8fafc;
-  z-index: 10;
-}
-
-.timeline-card {
-  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.02) !important;
-  border: 1px solid rgba(226, 232, 240, 0.7) !important;
-}
-
-.timeline-card:hover {
-  border-color: #cbd5e1 !important;
-}
-
-/* AI Conditions Progress Bar */
+/* Dynamic AI Conditions Differential Progress */
 .ai-diagnosis-result-area {
   animation: fadeIn 0.3s ease-out;
 }
@@ -158,4 +176,16 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Pro pricing promotional widget */
+.pro-plan-promo-widget {
+  background: var(--stitch-surface-container);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+.pro-plan-promo-widget:hover {
+  background: var(--stitch-surface-container-high);
 }
