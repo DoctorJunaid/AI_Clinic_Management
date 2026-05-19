@@ -59,13 +59,13 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       {/* Logo */}
-      <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(15, 23, 42, 0.05)' }}>
-        <img src={logoImg} alt="Saylani Clinic" style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0 }} />
+      <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.85rem 0.85rem', borderBottom: '1px solid rgba(15, 23, 42, 0.05)' }}>
+        <img src={logoImg} alt="Saylani Clinic" style={{ width: '32px', height: '32px', objectFit: 'contain', flexShrink: 0 }} />
         <div className="brand-text" style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
-          <span className="brand-name" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.0625rem', fontWeight: '800', color: '#000000', letterSpacing: '-0.04em' }}>
+          <span className="brand-name" style={{ fontFamily: 'var(--font-heading)', fontSize: '0.9rem', fontWeight: '800', color: '#000000', letterSpacing: '-0.04em' }}>
             SAYLANI CLINIC<span className="text-[#c8f17a]">.</span>
           </span>
-          <span className="brand-sub" style={{ fontFamily: 'var(--font-sans)', fontSize: '0.65rem', color: 'var(--text-secondary)', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+          <span className="brand-sub" style={{ fontFamily: 'var(--font-sans)', fontSize: '0.6rem', color: 'var(--text-secondary)', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
             AI CLINIC
           </span>
         </div>

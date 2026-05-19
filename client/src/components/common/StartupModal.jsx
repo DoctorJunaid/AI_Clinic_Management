@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
-import startupGraphic from '../../assets/Gemini_Generated_Image_b3gts4b3gts4b3gt (1).png'; // Flagship uncropped centered logo graphic
+import startupGraphic from '../../assets/Gemini_Generated_Image_b3gts4b3gts4b3gt (1).webp'; // Flagship uncropped centered logo graphic
 
 const StartupModal = ({ isOpen, onClose }) => {
   const modalRef = useRef(null);

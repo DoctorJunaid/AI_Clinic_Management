@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 console.log('Attempting to connect to MongoDB Atlas at:');
 console.log(process.env.MONGODB_URI ? process.env.MONGODB_URI.substring(0, 60) + '...' : 'Undefined URI');
