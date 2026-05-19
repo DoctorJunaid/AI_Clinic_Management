@@ -213,10 +213,12 @@ const Appointments = () => {
     let combined = [...matchingSeeds];
 
     processedBackend.forEach(backendItem => {
-      const exists = combined.some(seed => 
-        seed.patientId.name.toLowerCase() === backendItem.patientId.name.toLowerCase() &&
-        seed.timeSlot === backendItem.timeSlot
-      );
+      const exists = combined.some(seed => {
+        const seedName = seed.patientId?.name || '';
+        const backendName = backendItem.patientId?.name || '';
+        return seedName.toLowerCase() === backendName.toLowerCase() &&
+               seed.timeSlot === backendItem.timeSlot;
+      });
       if (!exists) {
         combined.push(backendItem);
       }
@@ -232,11 +234,14 @@ const Appointments = () => {
 
     if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      combined = combined.filter(app => 
-        app.patientId.name.toLowerCase().includes(query) ||
-        app.notes.toLowerCase().includes(query) ||
-        (app.doctor && app.doctor.toLowerCase().includes(query))
-      );
+      combined = combined.filter(app => {
+        const name = app.patientId?.name || '';
+        const notes = app.notes || '';
+        const doctor = app.doctor || '';
+        return name.toLowerCase().includes(query) ||
+               notes.toLowerCase().includes(query) ||
+               doctor.toLowerCase().includes(query);
+      });
     }
 
     return combined.sort((a, b) => parseTime(a.timeSlot) - parseTime(b.timeSlot));
@@ -337,7 +342,7 @@ const Appointments = () => {
       </div>
 
       {/* Main Column Grid */}
-      <div className="grid grid-cols-1 appointments-appointments-grid gap-5 items-start">
+      <div className="grid appointments-appointments-grid gap-5 items-start">
         
         {/* Booking Card & Calendar Column */}
         <div className="appointments-col-left flex flex-col gap-4">
