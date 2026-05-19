@@ -73,8 +73,7 @@ const Appointments = () => {
       setAppointments(appointments.map(app => app._id === id ? { ...app, status: newStatus } : app));
       toast.success(`Appointment status updated to ${newStatus}`);
     } catch (err) {
-      toast.error('Status updated successfully');
-      setAppointments(appointments.map(app => app._id === id ? { ...app, status: newStatus } : app));
+      toast.error(err.response?.data?.message || 'Failed to update status');
     }
   };
 
@@ -110,22 +109,7 @@ const Appointments = () => {
       setNotes('');
       toast.success('Appointment booked successfully!');
     } catch (err) {
-      // Offline fallback scheduling
-      const foundPat = patients.find(p => p._id === selectedPatient);
-      const mockApp = {
-        _id: 'mock-' + Math.random().toString(36).substr(2, 9),
-        patientId: foundPat || { name: 'Sarah Jenkins' },
-        date: new Date(appointmentDate).toISOString(),
-        timeSlot: timeSlot,
-        notes: notes,
-        status: 'confirmed'
-      };
-      setAppointments([mockApp, ...appointments]);
-      setIsBookModalOpen(false);
-      setSelectedPatient('');
-      setAppointmentDate('');
-      setNotes('');
-      toast.success('Appointment booked in smart local workspace!');
+      toast.error(err.response?.data?.message || 'Failed to book appointment');
     }
   };
 
