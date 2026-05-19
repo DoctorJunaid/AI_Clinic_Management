@@ -1,42 +1,44 @@
 .appointments-container {
-  padding: 1.5rem;
+  padding: 0;
   width: 100%;
 }
 
 .appointments-filter-bar {
   background: var(--surface);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  padding: 0.5rem;
 }
 
 .filter-btn {
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: var(--radius-md);
+  padding: 0.5rem 1.125rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
   border: 1px solid transparent;
-  color: var(--neutral-600);
+  color: var(--text-secondary);
   background: transparent;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all var(--t-base) var(--ease-out);
   cursor: pointer;
+  font-family: var(--font-sans);
 }
 
 .filter-btn:hover {
-  background: var(--neutral-100);
-  color: var(--neutral-900);
+  background: var(--surface-2);
+  color: var(--text-primary);
 }
 
 .filter-btn.active {
-  background: var(--brand-50);
-  color: var(--brand-700);
-  border-color: var(--brand-200);
-  font-weight: 600;
+  background: var(--neutral-900);
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
 .appointments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
 }
 
@@ -44,93 +46,70 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: var(--radius-xl);
+  transition: all var(--t-base) var(--ease-out);
   background: var(--surface);
+  padding: 1.5rem;
 }
 
 .appointment-card:hover {
-  transform: translateY(-4px);
+  border-color: var(--neutral-400);
   box-shadow: var(--shadow-md);
-  border-color: var(--brand-100);
 }
 
 .avatar-chip {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: var(--brand-100);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--brand-50);
+  border: 1.5px solid var(--brand-100);
   color: var(--brand-700);
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.0625rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-xs);
 }
 
 .appointment-meta-details {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  margin: 1rem 0;
+  margin: 1.25rem 0;
 }
 
 .meta-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--neutral-600);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .meta-notes {
-  background: var(--neutral-50);
-  border: 1px solid var(--neutral-100);
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 .meta-notes strong {
-  color: var(--neutral-800);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .appointment-actions {
-  margin-top: auto;
-}
-
-.badge {
-  padding: 0.25rem 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  border-radius: 20px;
-  letter-spacing: 0.025em;
-  text-transform: capitalize;
-}
-
-.badge-success {
-  background: var(--emerald-50);
-  color: var(--emerald-700);
-  border: 1px solid var(--emerald-100);
-}
-
-.badge-info {
-  background: var(--brand-50);
-  color: var(--brand-700);
-  border: 1px solid var(--brand-100);
-}
-
-.badge-warning {
-  background: #fef3c7;
-  color: #d97706;
-  border: 1px solid #fde68a;
-}
-
-.badge-danger {
-  background: #fee2e2;
-  color: #dc2626;
-  border: 1px solid #fecaca;
+  margin-top: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .modal-backdrop {
@@ -140,7 +119,7 @@
   width: 100vw;
   height: 100vh;
   background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,20 +129,22 @@
 .modal-content {
   background: var(--surface);
   border-radius: var(--radius-2xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border);
   width: 90%;
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalSlide var(--t-base) var(--ease-out);
 }
 
 .modal-header {
-  padding: 1.25rem 1.5rem;
-  border-bottom: 1px solid var(--neutral-100);
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 
 .modal-body {
@@ -173,7 +154,7 @@
 @keyframes modalSlide {
   from {
     opacity: 0;
-    transform: translateY(20px) scale(0.96);
+    transform: translateY(16px) scale(0.97);
   }
   to {
     opacity: 1;

@@ -1,5 +1,5 @@
 .patient-portal-container {
-  padding: 1.5rem;
+  padding: 0;
   width: 100%;
 }
 
@@ -10,16 +10,16 @@
 }
 
 .portal-list-item {
-  padding: 1rem;
+  padding: 1.25rem;
   border-radius: var(--radius-lg);
   background: var(--surface);
-  border: 1px solid var(--neutral-100);
-  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+  transition: all var(--t-base) var(--ease-out);
 }
 
 .portal-list-item:hover {
-  border-color: var(--brand-200);
-  background: var(--neutral-50);
+  border-color: var(--neutral-400);
+  background: var(--surface-2);
 }
 
 @media (max-width: 768px) {

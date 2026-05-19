@@ -1,22 +1,32 @@
 /* ──────────────────────────────────────────────
-   Dashboard.css
-────────────────────────────────────────────── */
+   Dashboard.css - Redesigned for premium look and high readability
+   ────────────────────────────────────────────── */
 
 .dashboard {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 .dashboard-stats {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
 }
 
 .stat-card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1.125rem 1.25rem;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--t-base) var(--ease-out);
+}
+
+.stat-card:hover {
+  border-color: var(--neutral-400) !important;
+  box-shadow: var(--shadow-md);
 }
 
 .stat-header {
@@ -28,24 +38,25 @@
 .stat-icon-wrapper {
   width: 44px;
   height: 44px;
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-lg);
   background: var(--brand-50);
+  border: 1.5px solid var(--brand-100);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
-  box-shadow: 0 0 0 1px var(--primary-ring) inset;
+  color: var(--brand-700);
+  box-shadow: var(--shadow-xs);
 }
 
 .more-btn {
-  color: var(--text-muted);
+  color: var(--text-secondary);
   width: 28px;
   height: 28px;
-  border-radius: var(--r-md);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--t-fast);
+  transition: all var(--t-fast) var(--ease-out);
 }
 
 .more-btn:hover {
@@ -54,19 +65,21 @@
 }
 
 .stat-body {
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
 }
 
 .stat-body h3 {
-  font-family: 'JetBrains Mono', 'Plus Jakarta Sans', monospace;
-  font-size: 2.375rem;
+  font-family: var(--font-heading);
+  font-size: 2rem;
   font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: 0.125rem;
+  margin-bottom: 0.25rem;
   letter-spacing: -0.05em;
+  line-height: 1.1;
 }
 
 .stat-body p {
+  font-family: var(--font-sans);
   font-size: 0.8125rem;
   color: var(--text-secondary);
   font-weight: 600;
@@ -77,7 +90,8 @@
   align-items: center;
   gap: 0.5rem;
   margin-top: auto;
-  padding-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
 }
 
 .stat-card .badge {
@@ -85,16 +99,25 @@
   padding: 0 !important;
   font-size: 0.8125rem;
   font-weight: 700;
+  border: none !important;
 }
 
 .stat-period {
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   color: var(--text-muted);
   font-weight: 500;
 }
 
 .w-auto { width: auto; }
-.select-sm { padding: 0.4rem 2rem 0.4rem 0.75rem; height: 32px; font-size: 0.8125rem; }
+.select-sm { 
+  padding: 0.4rem 2rem 0.4rem 0.75rem; 
+  height: 32px; 
+  font-size: 0.8125rem; 
+  font-family: var(--font-sans);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
 
 /* Appointments List */
 .appointment-list {
@@ -108,25 +131,24 @@
   align-items: center;
   gap: 1rem;
   padding: 0.875rem;
-  border-radius: var(--r-lg);
-  border: none !important;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border) !important;
   background: var(--surface);
-  transition: all var(--t-base);
+  transition: all var(--t-base) var(--ease-out);
   cursor: pointer;
 }
 
 .appointment-item:hover {
-  border-color: var(--border-hover);
+  border-color: var(--neutral-400) !important;
   background: var(--surface-2);
-  transform: translateX(2px);
 }
 
 .apt-avatar {
   width: 44px;
   height: 44px;
-  border-radius: var(--r-full);
+  border-radius: var(--radius-full);
   object-fit: cover;
-  border: 2px solid var(--surface-3);
+  border: 1.5px solid var(--border);
 }
 
 .apt-details {
@@ -134,12 +156,15 @@
 }
 
 .apt-details h4 {
+  font-family: var(--font-heading);
   font-size: 0.875rem;
+  font-weight: 700;
   margin-bottom: 0.125rem;
   color: var(--text-primary);
 }
 
 .apt-details p {
+  font-family: var(--font-sans);
   font-size: 0.75rem;
   color: var(--text-secondary);
 }
@@ -155,12 +180,14 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  font-family: var(--font-sans);
   font-size: 0.6875rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .apt-status {
+  font-family: var(--font-sans);
   font-size: 0.725rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -185,15 +212,15 @@
 }
 
 .status-confirmed {
-  color: #10b981 !important;
+  color: var(--success) !important;
 }
 
 .status-in-progress {
-  color: #3b82f6 !important;
+  color: var(--info) !important;
 }
 
 .status-pending {
-  color: #f59e0b !important;
+  color: var(--warning) !important;
 }
 
 /* Responsive adjustments */

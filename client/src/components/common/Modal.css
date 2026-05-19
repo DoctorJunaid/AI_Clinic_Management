@@ -3,7 +3,8 @@
   position: fixed;
   inset: 0;
   background-color: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -18,4 +19,12 @@
   overflow-y: auto;
   box-shadow: var(--shadow-xl);
   border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
+  background: var(--surface);
+  animation: modalScaleUp var(--t-base) var(--ease-out);
+}
+
+@keyframes modalScaleUp {
+  from { opacity: 0; transform: scale(0.97) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
 }

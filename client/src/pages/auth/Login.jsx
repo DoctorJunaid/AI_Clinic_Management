@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { Mail, Lock, ArrowRight, Heart } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import logoImg from '../../assets/logo.png';
 import './Auth.css';
 
 const Login = () => {
@@ -51,8 +52,16 @@ const Login = () => {
         <div className="auth-left-pane">
           
           {/* SAYLANI CLINIC Logo */}
-          <div className="auth-brand-logo">
-            SAYLANI CLINIC<span>.</span>
+          <div className="auth-brand-logo" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', marginBottom: '1.5rem' }}>
+            <img src={logoImg} alt="Saylani Clinic Logo" style={{ width: '48px', height: '48px', objectFit: 'contain', flexShrink: 0 }} />
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: '1.2' }}>
+              <span style={{ fontFamily: 'var(--font-heading)', fontSize: '1.45rem', fontWeight: '800', color: '#000000', letterSpacing: '-0.04em' }}>
+                SAYLANI CLINIC<span style={{ color: 'var(--brand-600)' }}>.</span>
+              </span>
+              <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.725rem', color: 'var(--text-secondary)', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                AI CLINIC
+              </span>
+            </div>
           </div>
 
           {/* Main content Area */}

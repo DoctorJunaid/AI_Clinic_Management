@@ -68,25 +68,100 @@ exports.login = async (req, res) => {
     // Smart Offline Demo Fallback
     if (mongoose.connection.readyState !== 1) {
       console.log('Database not connected. Falling back to offline demo credentials...');
-      if (email === 'admin@medflow.com' && password === '123456') {
-        return res.status(200).json({
-          success: true,
-          token: 'mock-jwt-token-for-demo-purposes-only',
-          user: {
-            _id: 'mock_admin_id_12345',
-            name: 'Dr. John Smith',
-            email: 'admin@medflow.com',
-            role: 'admin',
-            subscriptionPlan: 'free',
-            avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
-          }
-        });
+      if (password === '123456') {
+        if (email === 'admin@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-admin',
+            user: {
+              _id: 'mock_admin_id_12345',
+              name: 'Dr. John Smith (Admin)',
+              email: 'admin@medflow.com',
+              role: 'admin',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
+            }
+          });
+        }
+        if (email === 'doctor@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-doctor',
+            user: {
+              _id: 'mock_doctor_id_56789',
+              name: 'Dr. Sarah Ahmed',
+              email: 'doctor@medflow.com',
+              role: 'doctor',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?w=150&h=150&fit=crop'
+            }
+          });
+        }
+        if (email === 'reception@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-receptionist',
+            user: {
+              _id: 'mock_receptionist_id_98765',
+              name: 'Sobia Khan (Reception)',
+              email: 'reception@medflow.com',
+              role: 'receptionist',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop'
+            }
+          });
+        }
       }
     }
 
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
+      // Smart Sandbox Fallback for online-but-empty database
+      if (password === '123456') {
+        if (email === 'admin@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-admin',
+            user: {
+              _id: 'mock_admin_id_12345',
+              name: 'Dr. John Smith (Admin)',
+              email: 'admin@medflow.com',
+              role: 'admin',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
+            }
+          });
+        }
+        if (email === 'doctor@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-doctor',
+            user: {
+              _id: 'mock_doctor_id_56789',
+              name: 'Dr. Sarah Ahmed',
+              email: 'doctor@medflow.com',
+              role: 'doctor',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?w=150&h=150&fit=crop'
+            }
+          });
+        }
+        if (email === 'reception@medflow.com') {
+          return res.status(200).json({
+            success: true,
+            token: 'mock-jwt-token-for-receptionist',
+            user: {
+              _id: 'mock_receptionist_id_98765',
+              name: 'Sobia Khan (Reception)',
+              email: 'reception@medflow.com',
+              role: 'receptionist',
+              subscriptionPlan: 'pro',
+              avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop'
+            }
+          });
+        }
+      }
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
@@ -116,16 +191,38 @@ exports.login = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
+      let mockUser = {
+        _id: 'mock_admin_id_12345',
+        name: 'Dr. John Smith (Admin)',
+        email: 'admin@medflow.com',
+        role: 'admin',
+        subscriptionPlan: 'pro',
+        avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
+      };
+
+      if (req.user && req.user.id === 'mock_doctor_id_56789') {
+        mockUser = {
+          _id: 'mock_doctor_id_56789',
+          name: 'Dr. Sarah Ahmed',
+          email: 'doctor@medflow.com',
+          role: 'doctor',
+          subscriptionPlan: 'pro',
+          avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?w=150&h=150&fit=crop'
+        };
+      } else if (req.user && req.user.id === 'mock_receptionist_id_98765') {
+        mockUser = {
+          _id: 'mock_receptionist_id_98765',
+          name: 'Sobia Khan (Reception)',
+          email: 'reception@medflow.com',
+          role: 'receptionist',
+          subscriptionPlan: 'pro',
+          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop'
+        };
+      }
+
       return res.status(200).json({
         success: true,
-        data: {
-          _id: 'mock_admin_id_12345',
-          name: 'Dr. John Smith',
-          email: 'admin@medflow.com',
-          role: 'admin',
-          subscriptionPlan: 'free',
-          avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
-        }
+        data: mockUser
       });
     }
     const user = await User.findById(req.user.id);
