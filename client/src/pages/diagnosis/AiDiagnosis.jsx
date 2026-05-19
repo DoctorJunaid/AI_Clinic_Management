@@ -24,13 +24,11 @@ const AiDiagnosis = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   
-  // Prescription state
-  const [prescriptionList, setPrescriptionList] = useState([
-    { name: 'Albuterol HFA Inhaler', dosage: '2 puffs every 4-6 hours as needed' },
-    { name: 'Amoxicillin 500mg', dosage: '1 tablet 3 times daily for 7 days' }
-  ]);
+  // Prescription state - initializing empty so the doctor builds it dynamically
+  const [prescriptionList, setPrescriptionList] = useState([]);
   const [newPrescName, setNewPrescName] = useState('');
   const [newPrescDosage, setNewPrescDosage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const getTodayKey = () => {
     return 'ai_diag_usage_' + new Date().toISOString().split('T')[0];
@@ -60,8 +58,16 @@ const AiDiagnosis = () => {
         const first = res.data.data[0];
         setSelectedPatient(first._id);
         setPatientDetails(first);
-        setChiefComplaint('Reports high-grade fever with chills, persistent dry cough, and intense body aches for 3 days.');
-        setSymptoms(['Fever', 'Cough', 'Body Aches']);
+        setChiefComplaint(first.medicalHistory || 'Presenting for routine checkup and symptom assessment.');
+        
+        // Auto-extract matching preset symptoms from history
+        const historyText = (first.medicalHistory || '').toLowerCase();
+        const detected = [];
+        if (historyText.includes('fever')) detected.push('Fever');
+        if (historyText.includes('cough')) detected.push('Cough');
+        if (historyText.includes('headache')) detected.push('Headache');
+        if (historyText.includes('dizziness')) detected.push('Dizziness');
+        setSymptoms(detected);
       }
     } catch (err) {
       console.error('Failed to load patients for AI Diagnosis');
@@ -79,9 +85,19 @@ const AiDiagnosis = () => {
     }
     const found = patients.find(p => p._id === patientId);
     setPatientDetails(found);
-    setChiefComplaint('Patient reports high fever, persistent headache, and severe joint pains.');
-    setSymptoms(['Fever', 'Headache']);
+    setChiefComplaint(found.medicalHistory || 'No active medical history recorded. Presenting for symptom evaluation.');
+    
+    // Auto-extract matching preset symptoms from medical history
+    const historyText = (found.medicalHistory || '').toLowerCase();
+    const detected = [];
+    if (historyText.includes('fever')) detected.push('Fever');
+    if (historyText.includes('cough')) detected.push('Cough');
+    if (historyText.includes('headache')) detected.push('Headache');
+    if (historyText.includes('dizziness')) detected.push('Dizziness');
+    setSymptoms(detected);
+    
     setDiagnosisResult(null);
+    setPrescriptionList([]); // Clear prescription list when patient changes
   };
 
   const toggleSymptom = (symptom) => {
@@ -158,6 +174,42 @@ const AiDiagnosis = () => {
 
   const removePrescription = (index) => {
     setPrescriptionList(prescriptionList.filter((_, i) => i !== index));
+  };
+
+  const handleSavePrescription = async () => {
+    if (!selectedPatient) {
+      toast.error('Please select a patient first.');
+      return;
+    }
+    if (prescriptionList.length === 0) {
+      toast.error('Please add at least one medication to prescribe.');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const activeDiagnosisName = diagnosisResult?.conditions?.[0]?.name || 'General Clinical Evaluation';
+      
+      const payload = {
+        patientId: selectedPatient,
+        medicines: prescriptionList.map(med => ({
+          name: med.name,
+          dosage: med.dosage,
+          frequency: 'As directed',
+          duration: 'Complete course'
+        })),
+        instructions: chiefComplaint || 'Take medications exactly as prescribed.',
+        notes: `AI Diagnostic Desk: ${activeDiagnosisName}`
+      };
+
+      await axios.post('/api/v1/prescriptions', payload);
+      toast.success('Digital Prescription successfully saved to MongoDB!');
+      setPrescriptionList([]); // Clear prescription list on successful save
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to save digital prescription.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -456,6 +508,17 @@ const AiDiagnosis = () => {
                 </button>
               </div>
             </div>
+
+            {prescriptionList.length > 0 && (
+              <button 
+                onClick={handleSavePrescription}
+                disabled={isSaving}
+                className="bg-[#c8f17a] hover:bg-[#b5dc64] text-black font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-all mt-3 w-full shadow-sm"
+              >
+                <CheckCircle size={15} />
+                <span>{isSaving ? 'Saving to Database...' : 'Save Digital Prescription to MongoDB'}</span>
+              </button>
+            )}
           </div>
 
         </div>
