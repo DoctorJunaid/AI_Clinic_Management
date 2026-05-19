@@ -24,7 +24,7 @@ const Appointments = () => {
   const [notes, setNotes] = useState('');
 
   // Selected date on mini calendar
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date(2023, 9, 12)); // default Oct 12, 2023 matching mockup
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date()); // default to today's date so it loads dynamic current data
 
   const timeSlots = [
     '09:00 AM - 09:30 AM',
@@ -111,7 +111,15 @@ const Appointments = () => {
       };
 
       await axios.post('/api/v1/appointments', newApp);
-      fetchAppointments(selectedCalendarDate);
+      
+      // Auto-switch calendar selection to the booked date so the user sees it immediately!
+      if (appointmentDate) {
+        const parts = appointmentDate.split('-');
+        const bookedDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        setSelectedCalendarDate(bookedDate);
+      } else {
+        fetchAppointments(selectedCalendarDate);
+      }
       
       setSelectedPatient('');
       setAppointmentDate('');
@@ -124,13 +132,18 @@ const Appointments = () => {
   };
 
   // Pre-seeded timeline records matching the high-fidelity mock
+  const getTodaySeedDateStr = () => {
+    const today = new Date();
+    return new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+  };
+
   const seedAppointments = [
     {
       _id: 'seed-1',
       patientId: { name: 'Sarah Jenkins' },
       notes: 'Annual Checkup',
       timeSlot: '09:00 AM',
-      date: new Date(2023, 9, 12).toISOString(),
+      date: getTodaySeedDateStr(),
       status: 'in progress',
       doctor: 'Dr. Aris Thorne',
       avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
@@ -142,7 +155,7 @@ const Appointments = () => {
       patientId: { name: 'Marcus Rodriguez' },
       notes: 'Blood Test Results',
       timeSlot: '10:30 AM',
-      date: new Date(2023, 9, 12).toISOString(),
+      date: getTodaySeedDateStr(),
       status: 'pending',
       doctor: 'Lab Room B',
       initials: 'MR',
@@ -153,7 +166,7 @@ const Appointments = () => {
       patientId: { name: 'David Chen' },
       notes: 'Consultation',
       timeSlot: '11:15 AM',
-      date: new Date(2023, 9, 12).toISOString(),
+      date: getTodaySeedDateStr(),
       status: 'confirmed',
       doctor: 'Dr. Aris Thorne',
       avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
@@ -252,6 +265,11 @@ const Appointments = () => {
     };
 
     const hasDot = (day) => {
+      const today = new Date();
+      // Highlight days with seeded/booked appointments for maximum feedback
+      if (selectedCalendarDate.getMonth() === today.getMonth() && selectedCalendarDate.getFullYear() === today.getFullYear()) {
+        return [today.getDate(), today.getDate() + 1].includes(day);
+      }
       if (selectedCalendarDate.getMonth() === 9 && selectedCalendarDate.getFullYear() === 2023) {
         return [2, 6, 10, 12, 19, 26].includes(day);
       }
@@ -282,7 +300,7 @@ const Appointments = () => {
         <div className="grid grid-cols-7 gap-y-1 text-center">
           {allDays.map((day, idx) => {
             if (day === null) return <span key={`pad-${idx}`} className="py-2 text-slate-200" />;
-            const isSelected = day === selectedCalendarDate.getDate() && selectedCalendarDate.getMonth() === 9 && selectedCalendarDate.getFullYear() === 2023;
+            const isSelected = day === selectedCalendarDate.getDate();
             return (
               <div 
                 key={`day-${day}`} 
@@ -384,23 +402,6 @@ const Appointments = () => {
               </div>
             </div>
 
-            {/* Smart Insights Banner (mockup widget styled inside glass-panel) */}
-            <div className="rounded-[16px] p-4 border-l-4 border-l-[#c8f17a] bg-gradient-to-r from-[#c8f17a]/5 to-slate-50/10 border border-slate-100 flex gap-4 items-start shadow-xs">
-              <div className="w-10 h-10 rounded-full bg-[#c8f17a] flex items-center justify-center shrink-0 shadow-sm shadow-[#c8f17a]/20">
-                <Sparkles size={14} className="text-black" />
-              </div>
-              <div className="flex flex-col flex-1 min-w-0">
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-xs font-bold text-slate-800 font-heading">Smart Insights</h3>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase font-mono">Just Now</span>
-                </div>
-                <p className="text-[11px] text-slate-600 leading-relaxed">
-                  Dr. Thorne is 15 mins behind. New estimate for <span className="text-black font-bold">David Chen</span> is 11:30 AM.{' '}
-                  <button className="text-[#496800] font-bold hover:underline cursor-pointer">Notify Patient?</button>
-                </p>
-              </div>
-            </div>
-
             {/* Appointments List */}
             {isLoading ? (
               <div className="flex justify-center items-center py-16">
@@ -480,7 +481,7 @@ const Appointments = () => {
                                   <>
                                     <button 
                                       onClick={() => handleStatusChange(app._id, 'confirmed')}
-                                      className="px-2.5 py-0.5 rounded-full bg-black text-[#c8f17a] hover:bg-slate-800 text-[9px] font-bold transition-colors cursor-pointer"
+                                      className="px-3.5 py-1 rounded-full bg-black text-[#c8f17a] hover:bg-slate-800 text-[11px] font-bold transition-all transform hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
                                     >
                                       Confirm
                                     </button>
@@ -490,7 +491,7 @@ const Appointments = () => {
                                   <>
                                     <button 
                                       onClick={() => handleStatusChange(app._id, 'completed')}
-                                      className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 text-[9px] font-bold transition-colors cursor-pointer"
+                                      className="px-3.5 py-1 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 text-[11px] font-bold transition-all transform hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
                                     >
                                       Done
                                     </button>
@@ -509,11 +510,7 @@ const Appointments = () => {
                                 <span>Pending</span>
                               </span>
                             )}
-                            {app.status === 'confirmed' && (
-                              <span className="px-2.5 py-0.5 border border-black text-black rounded-full font-mono text-[9px] font-bold uppercase tracking-wider">
-                                <span>OK</span>
-                              </span>
-                            )}
+
                             {app.status === 'completed' && (
                               <span className="px-2.5 py-0.5 bg-[#f3f8e6] text-[#496800] rounded-full font-mono text-[9px] font-bold uppercase tracking-wider border border-[#e5f1cc]">
                                 <span>Done</span>
