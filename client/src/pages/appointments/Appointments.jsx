@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Calendar, Clock, User, Plus, X, Check, Eye, Filter, CheckCircle, 
-  AlertCircle, AlertTriangle, ShieldAlert, Sparkles, Brain, Search, HelpCircle, ChevronRight
+  AlertCircle, AlertTriangle, ShieldAlert, Search, HelpCircle, ChevronRight
 } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
 import './Appointments.css';
 
 const Appointments = () => {
+  const { user } = useContext(AuthContext);
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,8 +40,12 @@ const Appointments = () => {
 
   useEffect(() => {
     fetchAppointments();
-    fetchPatients();
-  }, []);
+    if (user?.role !== 'patient') {
+      fetchPatients();
+    } else {
+      setSelectedPatient(user._id || user.id || '');
+    }
+  }, [user]);
 
   const fetchAppointments = async () => {
     try {
@@ -74,17 +80,21 @@ const Appointments = () => {
 
   const handleBookAppointment = async (e) => {
     e.preventDefault();
-    if (!selectedPatient || !appointmentDate || !timeSlot) {
+    const patientId = user?.role === 'patient' ? (user._id || user.id) : selectedPatient;
+    if (!patientId || !appointmentDate || !timeSlot) {
       toast.error('Please fill in all fields');
       return;
     }
 
     try {
-      const docRes = await axios.get('/api/v1/auth/me');
-      const doctorId = docRes.data.data._id;
+      let doctorId = 'mock_doctor_id_56789';
+      if (user?.role !== 'patient') {
+        const docRes = await axios.get('/api/v1/auth/me');
+        doctorId = docRes.data.data._id;
+      }
 
       const newApp = {
-        patientId: selectedPatient,
+        patientId: patientId,
         doctorId: doctorId,
         date: new Date(appointmentDate).toISOString(),
         timeSlot: timeSlot,
@@ -233,36 +243,49 @@ const Appointments = () => {
 
                   {/* Actions Panels */}
                   <div className="flex gap-2 self-end md:self-center">
-                    {app.status === 'pending' && (
-                      <>
-                        <button 
-                          onClick={() => handleStatusChange(app._id, 'confirmed')}
-                          className="bg-black text-[#c8f17a] hover:bg-slate-800 text-xs font-bold rounded-full px-4 py-2 transition-all"
-                        >
-                          Confirm
-                        </button>
+                    {user?.role === 'patient' ? (
+                      (app.status === 'pending' || app.status === 'confirmed') && (
                         <button 
                           onClick={() => handleStatusChange(app._id, 'cancelled')}
                           className="bg-slate-100 hover:bg-red-50 text-red-600 hover:text-red-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
                         >
-                          Cancel
+                          Cancel Appointment
                         </button>
-                      </>
-                    )}
-                    {app.status === 'confirmed' && (
+                      )
+                    ) : (
                       <>
-                        <button 
-                          onClick={() => handleStatusChange(app._id, 'completed')}
-                          className="bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
-                        >
-                          Complete
-                        </button>
-                        <button 
-                          onClick={() => handleStatusChange(app._id, 'cancelled')}
-                          className="bg-slate-100 hover:bg-red-50 text-red-600 hover:text-red-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
-                        >
-                          Cancel
-                        </button>
+                        {app.status === 'pending' && (
+                          <>
+                            <button 
+                              onClick={() => handleStatusChange(app._id, 'confirmed')}
+                              className="bg-black text-[#c8f17a] hover:bg-slate-800 text-xs font-bold rounded-full px-4 py-2 transition-all"
+                            >
+                              Confirm
+                            </button>
+                            <button 
+                              onClick={() => handleStatusChange(app._id, 'cancelled')}
+                              className="bg-slate-100 hover:bg-red-50 text-red-600 hover:text-red-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
+                        {app.status === 'confirmed' && (
+                          <>
+                            <button 
+                              onClick={() => handleStatusChange(app._id, 'completed')}
+                              className="bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
+                            >
+                              Complete
+                            </button>
+                            <button 
+                              onClick={() => handleStatusChange(app._id, 'cancelled')}
+                              className="bg-slate-100 hover:bg-red-50 text-red-600 hover:text-red-700 text-xs font-bold rounded-full px-4 py-2 transition-all"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        )}
                       </>
                     )}
                     {app.status === 'completed' && (
@@ -338,18 +361,27 @@ const Appointments = () => {
             <form onSubmit={handleBookAppointment} className="flex flex-col gap-4">
               {/* Select Patient */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold text-slate-500 uppercase">Select Patient</label>
-                <select 
-                  className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none"
-                  value={selectedPatient}
-                  onChange={(e) => setSelectedPatient(e.target.value)}
-                  required
-                >
-                  <option value="">-- Choose Patient File --</option>
-                  {patients.map(p => (
-                    <option key={p._id} value={p._id}>{p.name} (Age: {p.age})</option>
-                  ))}
-                </select>
+                <label className="text-xs font-bold text-slate-500 uppercase">Patient</label>
+                {user?.role === 'patient' ? (
+                  <input 
+                    type="text" 
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 focus:outline-none"
+                    value={user?.name || ''}
+                    disabled
+                  />
+                ) : (
+                  <select 
+                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none"
+                    value={selectedPatient}
+                    onChange={(e) => setSelectedPatient(e.target.value)}
+                    required
+                  >
+                    <option value="">-- Choose Patient File --</option>
+                    {patients.map(p => (
+                      <option key={p._id} value={p._id}>{p.name} (Age: {p.age})</option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {/* Appointment Date */}

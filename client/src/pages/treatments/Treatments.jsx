@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Plus, Search, Trash2, HelpCircle, Download, Brain, Sparkles, X, User, Lock } from 'lucide-react';
+import { FileText, Plus, Search, Trash2, HelpCircle, Download, Brain, X, User, Lock } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import PricingModal from '../../components/common/PricingModal';
 import './Treatments.css';
@@ -384,7 +384,7 @@ const Treatments = () => {
                             onClick={() => explainActivePrescription(activePrescription)}
                             disabled={isAiLoading}
                           >
-                            <Sparkles size={12} /> {isAiLoading ? 'Analyzing...' : 'Explain Meds'}
+                            <Brain size={12} /> {isAiLoading ? 'Analyzing...' : 'Explain Meds'}
                           </button>
                         )}
                       </div>

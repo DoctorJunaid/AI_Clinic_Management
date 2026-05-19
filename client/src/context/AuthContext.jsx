@@ -22,14 +22,44 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [loading, setLoading] = useState(true);
 
-  // Configure axios to always send token if available
+  // Configure Axios request and response interceptors
+  useEffect(() => {
+    const reqInterceptor = axios.interceptors.request.use(
+      (config) => {
+        const activeToken = localStorage.getItem('token') || token;
+        if (activeToken) {
+          config.headers['Authorization'] = `Bearer ${activeToken}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    const resInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        // Only clear credentials if the response is explicitly a 401 Unauthorized authentication failure
+        if (error.response && error.response.status === 401) {
+          console.warn('Axios Interceptor: Unauthorized 401. Clearing session.');
+          setToken(null);
+          setUser(null);
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      axios.interceptors.request.eject(reqInterceptor);
+      axios.interceptors.response.eject(resInterceptor);
+    };
+  }, [token]);
+
+  // Synchronize localStorage and initialize user session
   useEffect(() => {
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       localStorage.setItem('token', token);
       loadUser();
     } else {
-      delete axios.defaults.headers.common['Authorization'];
       localStorage.removeItem('token');
       setUser(null);
       setLoading(false);
@@ -41,8 +71,12 @@ export const AuthProvider = ({ children }) => {
       const res = await axios.get('/api/v1/auth/me');
       setUser(res.data.data);
     } catch (err) {
-      console.error('Error loading user', err);
-      setToken(null);
+      console.error('Error loading user details:', err);
+      // Retain token on slow connection/transient server 5xx errors;
+      // Only clear token if the response is explicitly 401 Unauthorized
+      if (err.response && err.response.status === 401) {
+        setToken(null);
+      }
     } finally {
       setLoading(false);
     }

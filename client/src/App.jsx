@@ -26,8 +26,9 @@ const PrivateRoute = ({ children }) => {
 
 // Role-Based Route Component
 const RoleRoute = ({ children, allowedRoles }) => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   
+  if (loading) return <div className="app-container" style={{justifyContent: 'center', alignItems: 'center'}}>Loading...</div>;
   if (!user) return <Navigate to="/login" />;
   if (!allowedRoles.includes(user.role)) return <Navigate to="/" />; // Redirect to dashboard if unauthorized
 

@@ -1,9 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Legend, Line } from 'recharts';
-import { Users, Calendar as CalendarIcon, Activity, TrendingUp, MoreHorizontal, ArrowUpRight, ArrowDownRight, Clock, Sparkles, Brain, Lock } from 'lucide-react';
+import { Users, Calendar as CalendarIcon, Activity, TrendingUp, MoreHorizontal, ArrowUpRight, ArrowDownRight, Clock, Brain, Lock } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import PricingModal from '../../components/common/PricingModal';
+import MyHealthHistory from '../patients/MyHealthHistory';
 import './Dashboard.css';
 
 const data = [
@@ -45,6 +46,11 @@ const StatCard = ({ title, value, change, icon: Icon, isIncrease, delay }) => (
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
+
+  if (user?.role === 'patient') {
+    return <MyHealthHistory />;
+  }
+
   const [isPricingOpen, setIsPricingOpen] = useState(false);
 
   const [forecastViews, setForecastViews] = useState(() => {
@@ -167,7 +173,7 @@ const Dashboard = () => {
           <div className="card-header flex justify-between items-center border-b border-slate-100 pb-3 mb-2">
             <div>
               <h2 className="card-title flex items-center gap-2 flex-wrap">
-                <Sparkles size={16} className="text-black fill-[#c8f17a]" />
+                <TrendingUp size={16} className="text-black" />
                 <span>AI Clinical Outbreak & Patient Load Forecasting</span>
                 {user?.subscriptionPlan !== 'pro' && (
                   <span style={{

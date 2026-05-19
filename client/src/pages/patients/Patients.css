@@ -117,64 +117,107 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  gap: 1.5rem;
 }
 
-.details-header {
+/* Elegant integrated Patient Hero Banner */
+.patient-hero-banner {
+  background: var(--surface) !important;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.tabs {
-  display: flex;
-  gap: 1.75rem;
+.avatar-ring-large {
+  padding: 4px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--primary-ring);
+  background: var(--surface);
+  display: inline-flex;
 }
 
-.tab {
-  padding: 0.625rem 0;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  color: var(--text-secondary);
-  border-bottom: 2px solid transparent;
-  transition: all var(--t-fast) var(--ease-out);
-  font-size: 0.8125rem;
-  cursor: pointer;
+.avatar-ring-large img {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
 }
 
-.tab:hover {
+.patient-hero-banner h2 {
+  font-family: var(--font-heading);
   color: var(--text-primary);
 }
 
-.tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 700;
+.patient-hero-banner .text-slate-500 {
+  color: var(--text-secondary);
 }
 
+.patient-hero-banner .btn {
+  white-space: nowrap;
+}
+
+/* Custom interactive Tab styling */
+.patient-tabs-row {
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.patient-tabs-row .tabs {
+  display: flex;
+  gap: 2rem;
+}
+
+.patient-tabs-row .tab {
+  padding-bottom: 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.patient-tabs-row .tab:hover {
+  color: var(--text-primary);
+}
+
+.patient-tabs-row .tab.active {
+  color: var(--neutral-900);
+  border-bottom-color: var(--neutral-900);
+}
+
+/* Scrollable content section */
 .details-content {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem;
+  padding-right: 0.25rem;
 }
 
-/* Mini Stats */
+/* Stats and AI styles */
 .stat-mini {
-  padding: 1.125rem;
+  padding: 1.25rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
 }
 
 .stat-icon-wrap {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-full);
   display: flex;
   align-items: center;
@@ -195,13 +238,13 @@
 .stat-info .label {
   font-family: var(--font-sans);
   font-size: 0.75rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .stat-info .val {
   font-family: var(--font-heading);
-  font-size: 1.1875rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--text-primary);
 }
@@ -213,11 +256,19 @@
   font-weight: 600;
 }
 
-/* AI Box */
+/* Smart Diagnosis AI panel styling */
+.ai-diagnosis-card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
 .ai-icon-bg {
   width: 36px;
   height: 36px;
-  background: var(--surface);
+  background: var(--surface-2);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
@@ -231,7 +282,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 0;
+  padding: 3rem 1.5rem;
   border: 1px dashed var(--border);
   border-radius: var(--radius-xl);
   background: var(--surface-2);
@@ -245,13 +296,13 @@
 
 .condition-card {
   background: var(--surface-2);
-  padding: 0.875rem 1.125rem;
+  padding: 1rem 1.25rem;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border);
 }
 
 .prob-bar {
-  height: 5px;
+  height: 6px;
   background: var(--surface-3);
   border-radius: var(--radius-full);
   overflow: hidden;
@@ -260,14 +311,14 @@
 
 .prob-fill {
   height: 100%;
-  background: var(--primary);
+  background: var(--neutral-900);
   border-radius: var(--radius-full);
 }
 
-/* Scans */
+/* Recent Diagnostic scans card */
 .scan-img-box {
   position: relative;
-  height: 140px;
+  height: 130px;
   border-radius: var(--radius-lg);
   overflow: hidden;
   background: var(--surface-2);
@@ -283,8 +334,8 @@
 .scan-overlay {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: linear-gradient(transparent, rgba(15, 23, 42, 0.8));
-  padding: 1.5rem 0.75rem 0.75rem;
+  background: linear-gradient(transparent, rgba(15, 23, 42, 0.85));
+  padding: 1.25rem 0.75rem 0.75rem;
   color: white;
   font-family: var(--font-sans);
   font-size: 0.75rem;
@@ -310,57 +361,74 @@
   color: var(--text-primary);
 }
 
-/* Profile Right Sidebar */
-.profile-img-center {
+/* Appointments strip visual card */
+.appointment-strip {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  text-align: center;
-}
-
-.avatar-ring {
-  padding: 5px;
-  border-radius: var(--radius-full);
-  border: 2px dashed var(--border-hover);
-  background: var(--surface);
-}
-
-.avatar-ring img {
-  width: 90px;
-  height: 90px;
-  border-radius: var(--radius-full);
-  object-fit: cover;
-}
-
-.profile-details-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-
-.detail-row {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-base) var(--ease-out);
 }
 
-.detail-row:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.appointment-strip:hover {
+  border-color: var(--border-hover);
 }
 
-.detail-row .label {
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+.strip-date {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.35rem 0.75rem;
+  text-align: center;
+  min-width: 50px;
 }
 
-.detail-row .val {
-  font-family: var(--font-sans);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-primary);
+.strip-date span {
+  display: block;
 }
+
+/* Longitudinal History Timeline styling */
+.timeline-stack {
+  position: relative;
+  padding-left: 2rem;
+  border-left: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.timeline-item {
+  position: relative;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2.375rem;
+  top: 0.5rem;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: var(--radius-full);
+  background: var(--neutral-900);
+  border: 2px solid var(--surface);
+  box-shadow: 0 0 0 4px var(--surface-2);
+  z-index: 2;
+}
+
+.timeline-card {
+  background: var(--surface);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--t-base) var(--ease-out);
+}
+
+.timeline-card:hover {
+  border-color: var(--border-hover);
+}
+

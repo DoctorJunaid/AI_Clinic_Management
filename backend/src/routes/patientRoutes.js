@@ -14,7 +14,7 @@ router.use(protect);
 
 router
   .route('/')
-  .get(getPatients)
+  .get(authorize('admin', 'doctor', 'receptionist'), getPatients)
   .post(authorize('admin', 'receptionist'), createPatient);
 
 router

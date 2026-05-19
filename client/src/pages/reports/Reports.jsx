@@ -6,7 +6,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
 import { 
-  Users, Activity, TrendingUp, BarChart3, ShieldAlert, Sparkles, Brain, Clock, ChevronRight
+  Users, Activity, TrendingUp, BarChart3, ShieldAlert, Brain, Clock, ChevronRight
 } from 'lucide-react';
 import './Reports.css';
 
@@ -246,7 +246,7 @@ const Reports = () => {
             <div className="absolute -right-4 -top-4 w-24 h-24 bg-secondary-container rounded-full blur-2xl opacity-20 pointer-events-none"></div>
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="text-[#c8f17a]" size={16} />
+                <Activity className="text-[#c8f17a]" size={16} />
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">System Status</span>
               </div>
               <h3 className="text-lg font-bold text-white mb-1">Enterprise Tier</h3>

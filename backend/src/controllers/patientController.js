@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 // Mock data list for Offline Demo
 let mockPatients = [
-  { _id: 'mock_p1', name: 'Sarah Jenkins', age: 28, gender: 'female', contact: '555-0199', bloodGroup: 'O+', medicalHistory: 'General checkup • 10:00 AM' },
+  { _id: 'mock_patient_id_55555', name: 'Sarah Jenkins', age: 28, gender: 'female', contact: '555-0199', bloodGroup: 'O+', medicalHistory: 'General checkup • 10:00 AM' },
   { _id: 'mock_p2', name: 'Michael Chen', age: 34, gender: 'male', contact: '555-0143', bloodGroup: 'A-', medicalHistory: 'Follow up • 11:30 AM' },
   { _id: 'mock_p3', name: 'Emily Davis', age: 41, gender: 'female', contact: '555-0182', bloodGroup: 'B+', medicalHistory: 'Vaccination • 02:00 PM' },
   { _id: 'mock_p4', name: 'Robert Wilson', age: 52, gender: 'male', contact: '555-0177', bloodGroup: 'O-', medicalHistory: 'Lab Results • 04:15 PM' }
@@ -30,6 +30,11 @@ exports.getPatients = async (req, res) => {
 // @access  Private
 exports.getPatient = async (req, res) => {
   try {
+    // Role-based Access Control: Patient can only view their own patient file
+    if (req.user.role === 'patient' && req.user.id !== req.params.id) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to view this patient record' });
+    }
+
     if (mongoose.connection.readyState !== 1) {
       const patient = mockPatients.find(p => p._id === req.params.id);
       if (!patient) {

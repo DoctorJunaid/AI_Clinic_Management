@@ -3,7 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { 
-  Brain, CheckCircle, ShieldAlert, Sparkles, Trash2, Plus, Heart, Sparkle, Lock
+  Brain, CheckCircle, ShieldAlert, Trash2, Plus, Heart, Lock
 } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import PricingModal from '../../components/common/PricingModal';
@@ -332,7 +332,7 @@ const AiDiagnosis = () => {
               <>
                 <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
-                    <Sparkles size={16} className="text-black fill-[#c8f17a]" />
+                    <Brain size={16} className="text-black" />
                     <span>AI Clinical Diagnosis Desk</span>
                     {user?.subscriptionPlan !== 'pro' && (
                       <span style={{

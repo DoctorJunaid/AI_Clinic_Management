@@ -21,6 +21,8 @@ exports.protect = async (req, res, next) => {
       req.user = { id: 'mock_doctor_id_56789', role: 'doctor' };
     } else if (token === 'mock-jwt-token-for-receptionist') {
       req.user = { id: 'mock_receptionist_id_98765', role: 'receptionist' };
+    } else if (token === 'mock-jwt-token-for-patient') {
+      req.user = { id: 'mock_patient_id_55555', role: 'patient' };
     } else {
       req.user = { id: 'mock_admin_id_12345', role: 'admin' };
     }
@@ -44,6 +46,8 @@ exports.protect = async (req, res, next) => {
         req.user = { id: 'mock_doctor_id_56789', role: 'doctor' };
       } else if (decoded.id === 'mock_receptionist_id_98765') {
         req.user = { id: 'mock_receptionist_id_98765', role: 'receptionist' };
+      } else if (decoded.id === 'mock_patient_id_55555') {
+        req.user = { id: 'mock_patient_id_55555', role: 'patient' };
       } else {
         req.user = { id: decoded.id, role: 'admin' };
       }

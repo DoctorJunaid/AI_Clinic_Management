@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { 
   User, Shield, CreditCard, Paintbrush, 
-  Building, Save, Check, Sparkles, Plus, Trash2 
+  Building, Save, Check, Plus, Trash2 
 } from 'lucide-react';
 import './Settings.css';
 
@@ -468,7 +468,7 @@ const Settings = () => {
                 >
                   <div className="sub-plan-details">
                     <strong>
-                      Pro Clinical AI Plan (PKR 12,500/mo) <Sparkles size={12} style={{ fill: '#c8f17a' }} />
+                      Pro Clinical AI Plan (PKR 12,500/mo)
                     </strong>
                     <span>Unlimited staff slots · Infinite Qwen symptom checks · Laboratory recommendations</span>
                   </div>

@@ -141,6 +141,14 @@ const Login = () => {
                 >
                   Receptionist
                 </button>
+                <button 
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => handleFastLogin('patient@medflow.com', '123456')}
+                  className="bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
+                >
+                  Patient
+                </button>
               </div>
             </div>
           </div>

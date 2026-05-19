@@ -168,12 +168,12 @@ const Sidebar = () => {
       {/* User section */}
       <div className="sidebar-user">
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Dr. Smith')}&background=ecfdf5&color=059669&bold=true&size=80`}
+          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Muhammad Junaid')}&background=ecfdf5&color=059669&bold=true&size=80`}
           alt="Profile"
           className="user-avatar"
         />
         <div className="user-meta">
-          <span className="user-name">{user?.name || 'Dr. John Smith'}</span>
+          <span className="user-name">{user?.name || 'Muhammad Junaid'}</span>
           <span className="user-role">{user?.role || 'Administrator'}</span>
         </div>
         <button onClick={handleLogout} className="logout-btn" title="Sign out">

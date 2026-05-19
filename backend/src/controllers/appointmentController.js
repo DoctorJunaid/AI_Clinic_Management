@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 let mockAppointments = [
   {
     _id: 'mock_a1',
-    patientId: { _id: 'mock_p1', name: 'Sarah Jenkins', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop' },
+    patientId: { _id: 'mock_patient_id_55555', name: 'Sarah Jenkins', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop' },
     doctorId: { _id: 'mock_doc1', name: 'Dr. John Smith', specialization: 'Cardiology' },
     date: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours from now
     status: 'scheduled',
@@ -36,7 +36,19 @@ exports.getAppointments = async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
       console.log('Database not connected. Falling back to offline mock appointments...');
-      return res.status(200).json({ success: true, count: mockAppointments.length, data: mockAppointments });
+      let userApps = mockAppointments;
+      if (req.user.role === 'patient') {
+        userApps = mockAppointments.filter(app => {
+          const pId = app.patientId && (app.patientId._id || app.patientId);
+          return pId === req.user.id;
+        });
+      } else if (req.user.role === 'doctor') {
+        userApps = mockAppointments.filter(app => {
+          const dId = app.doctorId && (app.doctorId._id || app.doctorId);
+          return dId === req.user.id;
+        });
+      }
+      return res.status(200).json({ success: true, count: userApps.length, data: userApps });
     }
 
     let query = {};
