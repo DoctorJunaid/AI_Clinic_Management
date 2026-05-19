@@ -100,8 +100,8 @@ const Dashboard = () => {
               <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="colorAppt" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#059669" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#059669" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#496800" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#496800" stopOpacity={0}/>
                   </linearGradient>
                   <linearGradient id="colorNew" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
@@ -116,7 +116,7 @@ const Dashboard = () => {
                   itemStyle={{ fontSize: '13px', fontWeight: 500 }}
                   labelStyle={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '4px' }}
                 />
-                <Area type="monotone" dataKey="appointments" name="Appointments" stroke="#059669" strokeWidth={3} fillOpacity={1} fill="url(#colorAppt)" activeDot={{r: 6, strokeWidth: 0}} />
+                <Area type="monotone" dataKey="appointments" name="Appointments" stroke="#496800" strokeWidth={3} fillOpacity={1} fill="url(#colorAppt)" activeDot={{r: 6, strokeWidth: 0}} />
                 <Area type="monotone" dataKey="newPatients" name="New Patients" stroke="#f59e0b" strokeWidth={3} fillOpacity={1} fill="url(#colorNew)" />
               </AreaChart>
             </ResponsiveContainer>
@@ -290,7 +290,7 @@ const Dashboard = () => {
                   <Legend verticalAlign="top" height={36} iconType="circle" wrapperStyle={{ fontSize: '11px', fontWeight: 600 }} />
                   <Line type="monotone" dataKey="Influenza" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                   <Line type="monotone" dataKey="Dengue" stroke="#ef4444" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
-                  <Line type="monotone" dataKey="Gastro" stroke="#10b981" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="Gastro" stroke="#496800" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>

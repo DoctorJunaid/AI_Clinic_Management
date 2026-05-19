@@ -137,7 +137,7 @@ const PricingModal = ({ isOpen, onClose }) => {
             <button 
               onClick={() => setBillingPeriod('yearly')}
               style={{
-                background: billingPeriod === 'yearly' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'transparent',
+                background: billingPeriod === 'yearly' ? 'linear-gradient(135deg, #496800 0%, #364e00 100%)' : 'transparent',
                 color: billingPeriod === 'yearly' ? '#ffffff' : '#64748b',
                 border: 'none',
                 padding: '0.45rem 1.25rem',
@@ -158,13 +158,13 @@ const PricingModal = ({ isOpen, onClose }) => {
           <div style={{ 
             marginTop: '0.85rem', 
             fontSize: '0.75rem', 
-            color: '#16a34a', 
+            color: '#496800', 
             fontWeight: '600',
-            background: '#f0fdf4',
+            background: '#f3f8e6',
             display: 'inline-block',
             padding: '0.35rem 1rem',
             borderRadius: '8px',
-            border: '1px dashed #bbf7d0'
+            border: '1px dashed #c8f17a'
           }}>
             Exclusive Beta Offer: Unlock the Pro Plan instantly to test all clinical intelligence components.
           </div>
@@ -201,11 +201,11 @@ const PricingModal = ({ isOpen, onClose }) => {
               
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#334155' }}>
-                  <Check size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <Check size={13} style={{ color: '#496800', shrink: 0 }} />
                   <span>Limit: Up to 5 Active Patients</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#334155' }}>
-                  <Check size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <Check size={13} style={{ color: '#496800', shrink: 0 }} />
                   <span>Standard Appointment Booking</span>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#94a3b8' }}>
@@ -249,7 +249,7 @@ const PricingModal = ({ isOpen, onClose }) => {
           {/* PRO PLAN CARD */}
           <div style={{
             background: '#ffffff',
-            border: '2px solid #10b981',
+            border: '2px solid #496800',
             borderRadius: '16px',
             padding: '2rem',
             display: 'flex',
@@ -257,13 +257,13 @@ const PricingModal = ({ isOpen, onClose }) => {
             justifyContent: 'space-between',
             position: 'relative',
             transition: 'all 0.2s ease',
-            boxShadow: '0 10px 25px rgba(16, 185, 129, 0.05)'
+            boxShadow: '0 10px 25px rgba(73, 104, 0, 0.05)'
           }}>
             <div style={{
               position: 'absolute',
               top: '-12px',
               right: '20px',
-              background: '#10b981',
+              background: '#496800',
               color: '#ffffff',
               fontSize: '0.65rem',
               fontWeight: '800',
@@ -278,7 +278,7 @@ const PricingModal = ({ isOpen, onClose }) => {
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: '#0f172a' }}>Pro Plan</h3>
-                <span style={{ fontSize: '0.65rem', color: '#16a34a', fontWeight: '700', background: '#dcfce7', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                <span style={{ fontSize: '0.65rem', color: '#496800', fontWeight: '700', background: '#e5f1cc', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
                   Save 20%
                 </span>
               </div>
@@ -295,23 +295,23 @@ const PricingModal = ({ isOpen, onClose }) => {
               
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#1e293b' }}>
-                  <ShieldCheck size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#496800', shrink: 0 }} />
                   <strong>Unlimited Patient Registers</strong>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#1e293b' }}>
-                  <ShieldCheck size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#496800', shrink: 0 }} />
                   <strong>AI Smart Symptom Diagnosis</strong>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#1e293b' }}>
-                  <ShieldCheck size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#496800', shrink: 0 }} />
                   <strong>AI Prescription Explainer (Urdu)</strong>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#1e293b' }}>
-                  <ShieldCheck size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#496800', shrink: 0 }} />
                   <strong>Predictive Disease Load Forecasting</strong>
                 </li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#1e293b' }}>
-                  <ShieldCheck size={13} style={{ color: '#10b981', shrink: 0 }} />
+                  <ShieldCheck size={13} style={{ color: '#496800', shrink: 0 }} />
                   <span>Advanced Patient & Revenue Analytics</span>
                 </li>
               </ul>

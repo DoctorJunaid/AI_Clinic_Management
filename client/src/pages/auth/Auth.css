@@ -68,7 +68,7 @@
 
 /* Left Pane Content */
 .auth-left-pane {
-  padding: 4rem 4.5rem;
+  padding: 2.25rem 3rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -79,15 +79,15 @@
 
 @media (max-width: 1024px) {
   .auth-left-pane {
-    padding: 2.5rem;
-    gap: 2.5rem;
+    padding: 2rem;
+    gap: 2rem;
   }
 }
 
 /* Logo Branding */
 .auth-brand-logo {
   font-family: var(--font-heading);
-  font-size: 1.625rem;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.04em;
   color: #000000;
@@ -100,7 +100,7 @@
 /* Main Heading Area */
 .auth-hero-heading {
   font-family: var(--font-heading);
-  font-size: 2.75rem;
+  font-size: 2.15rem;
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.04em;
@@ -114,16 +114,16 @@
 
 .auth-hero-sub {
   font-family: var(--font-sans);
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
   max-width: 440px;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 /* Compact form inputs */
 .auth-compact-form {
-  margin-top: 1.75rem;
+  margin-top: 1rem;
   max-width: 385px;
 }
 

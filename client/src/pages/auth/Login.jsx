@@ -114,41 +114,53 @@ const Login = () => {
             </form>
 
             {/* Quick-test access shortcuts inside the white canvas */}
-            <div className="mt-5">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Fast Access Testing Slots</span>
-              <div className="flex flex-wrap gap-1.5">
-                <button 
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleFastLogin('admin@medflow.com', '123456')}
-                  className="bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-                >
-                  Admin / Doctor 1
-                </button>
-                <button 
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleFastLogin('doctor@medflow.com', '123456')}
-                  className="bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-                >
-                  Doctor 2
-                </button>
-                <button 
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleFastLogin('reception@medflow.com', '123456')}
-                  className="bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-                >
-                  Receptionist
-                </button>
-                <button 
-                  type="button"
-                  disabled={isLoading}
-                  onClick={() => handleFastLogin('patient@medflow.com', '123456')}
-                  className="bg-slate-100/80 hover:bg-slate-200/80 text-slate-700 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all"
-                >
-                  Patient
-                </button>
+            <div className="mt-4 pt-3 border-t border-slate-100/60">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest block">
+                  One-Click Quick Login Portals
+                </span>
+                <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  Pass: 123456
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { role: 'Clinical Admin', email: 'admin@medflow.com', icon: '🔑', color: 'rgba(73, 104, 0, 0.05)', border: 'rgba(73, 104, 0, 0.12)' },
+                  { role: 'Assigned Specialist', email: 'doctor@medflow.com', icon: '🩺', color: 'rgba(73, 104, 0, 0.05)', border: 'rgba(73, 104, 0, 0.12)' },
+                  { role: 'Reception Desk', email: 'reception@medflow.com', icon: '📝', color: 'rgba(0, 0, 0, 0.02)', border: 'rgba(0, 0, 0, 0.04)' },
+                  { role: 'Registered Patient', email: 'patient@medflow.com', icon: '👤', color: 'rgba(0, 0, 0, 0.02)', border: 'rgba(0, 0, 0, 0.04)' }
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => handleFastLogin(item.email, '123456')}
+                    className="flex items-center gap-2 p-2 rounded-lg border text-left transition-all duration-200 hover:bg-slate-50 active:scale-[0.98]"
+                    style={{
+                      background: '#ffffff',
+                      borderColor: item.border,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{
+                      width: '24px',
+                      height: '24px',
+                      borderRadius: '6px',
+                      background: item.color,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.75rem',
+                      flexShrink: 0
+                    }}>
+                      {item.icon}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                      <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#0f172a', lineHeight: '1.2' }}>{item.role}</span>
+                      <span style={{ fontSize: '0.575rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '120px' }}>{item.email}</span>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           </div>

@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.use(protect);
 
-router.post('/symptom-check', authorize('doctor', 'admin'), symptomCheck);
+router.post('/symptom-check', authorize('doctor', 'admin', 'receptionist'), symptomCheck);
 router.post('/explain-prescription', explainPrescription);
 
 module.exports = router;

@@ -130,9 +130,9 @@ const Sidebar = () => {
             letterSpacing: '0.05em',
             padding: '0.15rem 0.5rem',
             borderRadius: '20px',
-            background: user?.subscriptionPlan === 'pro' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : '#e2e8f0',
+            background: user?.subscriptionPlan === 'pro' ? 'linear-gradient(135deg, #496800 0%, #364e00 100%)' : '#e2e8f0',
             color: user?.subscriptionPlan === 'pro' ? '#ffffff' : '#475569',
-            boxShadow: user?.subscriptionPlan === 'pro' ? '0 2px 10px rgba(16, 185, 129, 0.2)' : 'none'
+            boxShadow: user?.subscriptionPlan === 'pro' ? '0 2px 10px rgba(73, 104, 0, 0.2)' : 'none'
           }}>
             {user?.subscriptionPlan === 'pro' ? 'Pro Plan' : 'Free Plan'}
           </span>
@@ -153,13 +153,13 @@ const Sidebar = () => {
               textAlign: 'center',
               transition: 'all 0.2s ease'
             }}
-            onMouseOver={(e) => e.target.style.background = '#1e293b'}
+            onMouseOver={(e) => e.target.style.background = 'var(--brand-500)'}
             onMouseOut={(e) => e.target.style.background = '#000000'}
           >
             Upgrade to Pro
           </button>
         ) : (
-          <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: '600', textAlign: 'center', display: 'block' }}>
+          <span style={{ fontSize: '0.65rem', color: 'var(--brand-500)', fontWeight: '600', textAlign: 'center', display: 'block' }}>
             All Pro Features Unlocked!
           </span>
         )}
@@ -168,7 +168,7 @@ const Sidebar = () => {
       {/* User section */}
       <div className="sidebar-user">
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Muhammad Junaid')}&background=ecfdf5&color=059669&bold=true&size=80`}
+          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Muhammad Junaid')}&background=f3f8e6&color=496800&bold=true&size=80`}
           alt="Profile"
           className="user-avatar"
         />

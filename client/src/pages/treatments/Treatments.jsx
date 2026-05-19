@@ -96,7 +96,7 @@ const Treatments = () => {
     setIsAiLoading(true);
     try {
       const res = await axios.post('/api/v1/ai/explain-prescription', {
-        medicines: prescription.medicines,
+        medicines: prescription.medicines || [],
         instructions: prescription.instructions || ''
       });
       setAiExplanation(res.data.data.explanation);
@@ -223,7 +223,7 @@ const Treatments = () => {
                   </div>
                   <p className="text-xs text-brand font-medium">Dr. {pr.doctorId?.name || 'Staff'}</p>
                   <p className="text-xs text-muted mt-1 truncate">
-                    {pr.medicines.map(m => m.name).join(', ')}
+                    {pr.medicines?.map(m => m.name).join(', ') || 'No prescribed medicines'}
                   </p>
                 </div>
               ))}
@@ -287,7 +287,7 @@ const Treatments = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {activePrescription.medicines.map((med, index) => (
+                        {activePrescription.medicines?.map((med, index) => (
                           <tr key={index}>
                             <td><strong>{med.name}</strong></td>
                             <td>{med.dosage}</td>

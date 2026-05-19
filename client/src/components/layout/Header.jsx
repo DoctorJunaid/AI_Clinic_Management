@@ -40,7 +40,7 @@ const Header = ({ title = 'Dashboard', subtitle }) => {
         </button>
         
         <img 
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Dr. Smith')}&background=ecfdf5&color=059669&bold=true`}
+          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Dr. Smith')}&background=f3f8e6&color=496800&bold=true`}
           alt="Profile" 
           className="header-avatar hidden-desktop" 
         />

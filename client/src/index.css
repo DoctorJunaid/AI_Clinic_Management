@@ -1,80 +1,81 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Manrope:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
 
-/* ─── Premium Design Tokens ─── */
+/* ─── Premium Design Tokens (Medi-Glass Ethos) ─── */
 :root {
-  /* Brand (Modern Medical Emerald Theme) */
-  --brand-50:  #f0fdf4;
-  --brand-100: #dcfce7;
-  --brand-200: #bbf7d0;
-  --brand-300: #86efac;
-  --brand-400: #4ade80;
-  --brand-500: #22c55e;
-  --brand-600: #16a34a;
-  --brand-700: #15803d;
-  --brand-900: #14532d;
+  /* Brand (Medi-Glass Ethos Moss Green Theme) */
+  --brand-50:  #f3f8e6;
+  --brand-100: #e5f1cc;
+  --brand-200: #c8f17a; /* Secondary Container */
+  --brand-300: #add461;
+  --brand-400: #8ba846;
+  --brand-500: #496800; /* Primary Brand / Moss Green */
+  --brand-600: #364e00;
+  --brand-700: #1d2a00;
+  --brand-900: #131f00;
 
   /* Neutral (Slate Scale for Ultra-Clean Tech Contrast) */
   --neutral-0:   #ffffff;
-  --neutral-50:  #f8fafc;
-  --neutral-100: #f1f5f9;
-  --neutral-200: #e2e8f0;
-  --neutral-300: #cbd5e1;
-  --neutral-400: #94a3b8;
-  --neutral-500: #64748b;
-  --neutral-600: #475569;
-  --neutral-700: #334155;
-  --neutral-800: #1e293b;
-  --neutral-900: #0f172a;
-  --neutral-950: #020617;
+  --neutral-50:  #f9f9f9; /* Background */
+  --neutral-100: #f3f3f4; /* Low surface container */
+  --neutral-200: #eeeeee; /* Default surface container */
+  --neutral-300: #e8e8e8; /* High surface container */
+  --neutral-400: #c4c7c7; /* outline variant */
+  --neutral-500: #747878; /* outline */
+  --neutral-600: #5f5e5e; /* surface tint */
+  --neutral-700: #444748; /* on surface variant */
+  --neutral-800: #2f3131; /* inverse surface */
+  --neutral-900: #1a1c1c; /* on background / on surface */
+  --neutral-950: #000000; /* primary */
 
   /* Typography Families */
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-heading: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   /* Semantic Theme Tokens */
   --primary:        #000000;
-  --primary-hover:  #1e293b;
-  --primary-subtle: #f8fafc;
+  --primary-hover:  #1c1b1b;
+  --primary-subtle: #eeeeee;
   --primary-ring:   rgba(0, 0, 0, 0.05);
 
-  --surface:      var(--neutral-0);
-  --surface-2:    var(--neutral-50);
-  --surface-3:    var(--neutral-100);
-  --bg:           var(--neutral-50);
+  --surface:      rgba(255, 255, 255, 0.75);
+  --surface-2:    rgba(243, 243, 244, 0.75);
+  --surface-3:    rgba(238, 238, 238, 0.75);
+  --bg:           #f9f9f9;
 
   --text-primary:   var(--neutral-900);
-  --text-secondary: var(--neutral-500);
-  --text-muted:     var(--neutral-400);
+  --text-secondary: var(--neutral-700);
+  --text-muted:     var(--neutral-500);
 
-  --border:       rgba(15, 23, 42, 0.06);
-  --border-hover: rgba(15, 23, 42, 0.12);
+  --border:       rgba(0, 0, 0, 0.06);
+  --border-hover: rgba(0, 0, 0, 0.12);
 
-  --danger:       #ef4444;
-  --danger-bg:    #fef2f2;
-  --danger-border: #fecaca;
-  --warning:      #f59e0b;
-  --warning-bg:   #fffbeb;
-  --warning-border: #fde68a;
-  --info:         #3b82f6;
-  --info-bg:      #eff6ff;
-  --info-border:  #bfdbfe;
-  --success:      #10b981;
-  --success-bg:   #ecfdf5;
-  --success-border: #a7f3d0;
+  --danger:       #ba1a1a;
+  --danger-bg:    #ffdad6;
+  --danger-border: #ffb4ab;
+  --warning:      #bca100;
+  --warning-bg:   #fffbd0;
+  --warning-border: #daee13;
+  --info:         #006591;
+  --info-bg:      #c9e6ff;
+  --info-border:  #89ceff;
+  --success:      #496800;
+  --success-bg:   #e5f1cc;
+  --success-border: #c8f17a;
 
   /* Premium High-Contrast Shadows (No Blurry Muddy Looks) */
-  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.02);
-  --shadow-sm: 0 2px 8px -1px rgba(15, 23, 42, 0.04), 0 1px 3px -1px rgba(15, 23, 42, 0.02);
-  --shadow-md: 0 12px 20px -4px rgba(15, 23, 42, 0.05), 0 4px 8px -2px rgba(15, 23, 42, 0.02);
-  --shadow-lg: 0 20px 32px -8px rgba(15, 23, 42, 0.06), 0 8px 16px -4px rgba(15, 23, 42, 0.03);
-  --shadow-xl: 0 28px 48px -12px rgba(15, 23, 42, 0.08), 0 12px 24px -8px rgba(15, 23, 42, 0.04);
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.01);
+  --shadow-sm: 0 2px 12px -2px rgba(0, 0, 0, 0.04), 0 1px 4px -2px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 16px 24px -6px rgba(0, 0, 0, 0.06), 0 6px 12px -4px rgba(0, 0, 0, 0.02);
+  --shadow-lg: 0 24px 38px -10px rgba(0, 0, 0, 0.08), 0 10px 20px -6px rgba(0, 0, 0, 0.03);
+  --shadow-xl: 0 32px 56px -16px rgba(0, 0, 0, 0.1), 0 16px 32px -10px rgba(0, 0, 0, 0.05);
 
-  /* Border Radius (Uniform Styling) */
-  --r-sm:  0.375rem;
-  --r-md:  0.5rem;
-  --r-lg:  0.75rem;
-  --r-xl:  1rem;
-  --r-2xl: 1.5rem;
+  /* Border Radius (Hyper-Soft Aesthetics) */
+  --r-sm:  0.25rem;
+  --r-md:  9999px; /* Buttons and Badges are Pill-Shaped */
+  --r-lg:  1rem;
+  --r-xl:  1.5rem; /* Cards are heavily rounded */
+  --r-2xl: 2rem;
   --r-full: 9999px;
 
   /* Aliases for legacy system code compliance */
@@ -177,16 +178,18 @@ h5 { font-size: 0.9375rem; font-weight: 600; }
 /* ─── Premium Card Design ─── */
 .card {
   background: var(--surface);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
   padding: 1.5rem;
-  border: 1px solid var(--border) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
   transition: all var(--t-base) var(--ease-out);
 }
 
 .card:hover { 
   box-shadow: var(--shadow-md); 
-  border-color: rgba(15, 23, 42, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.45) !important;
   transform: translateY(-2px);
 }
 
@@ -207,6 +210,7 @@ h5 { font-size: 0.9375rem; font-weight: 600; }
 
 /* ─── Grid Utilities ─── */
 .grid { display: grid; gap: 1.5rem; }
+.font-mono { font-family: var(--font-mono) !important; }
 .grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
 .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-cols-3 { grid-template-columns: repeat(3, 1fr); }

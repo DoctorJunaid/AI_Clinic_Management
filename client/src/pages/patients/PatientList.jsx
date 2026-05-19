@@ -175,7 +175,7 @@ const PatientList = () => {
                     <div className="flex items-center gap-3 flex-wrap">
                       <h2 className="text-xl font-bold text-slate-800 tracking-tight">{activePatient.name}</h2>
                       <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded uppercase">
-                        ID: #PT-{activePatient._id.substring(0, 6).toUpperCase()}
+                        ID: #PT-{activePatient._id.slice(-6).toUpperCase()}
                       </span>
                     </div>
                     <div className="flex items-center gap-x-4 gap-y-1 text-xs text-slate-500 font-semibold flex-wrap">
@@ -243,14 +243,14 @@ const PatientList = () => {
                             <div className="stat-icon-wrap bg-danger-subtle w-10 h-10 rounded-full flex items-center justify-center shrink-0"><Heart className="text-danger" size={18} /></div>
                             <div className="stat-info flex flex-col">
                               <span className="label text-[10px] font-bold uppercase text-slate-400 tracking-wider">Heart Rate</span>
-                              <span className="val text-lg font-bold text-slate-800 mt-0.5">72 <span className="unit text-xs text-slate-400 font-semibold">bpm</span></span>
+                              <span className="val text-lg font-bold text-slate-800 mt-0.5 font-mono">72 <span className="unit text-xs text-slate-400 font-semibold">bpm</span></span>
                             </div>
                           </div>
                           <div className="card stat-mini shadow-sm border border-slate-100 flex items-center gap-4 p-5 rounded-2xl bg-white">
                             <div className="stat-icon-wrap bg-primary-subtle w-10 h-10 rounded-full flex items-center justify-center shrink-0"><Activity className="text-primary" size={18} /></div>
                             <div className="stat-info flex flex-col">
                               <span className="label text-[10px] font-bold uppercase text-slate-400 tracking-wider">Blood Pressure</span>
-                              <span className="val text-lg font-bold text-slate-800 mt-0.5">120/80 <span className="unit text-xs text-slate-400 font-semibold">mmHg</span></span>
+                              <span className="val text-lg font-bold text-slate-800 mt-0.5 font-mono">120/80 <span className="unit text-xs text-slate-400 font-semibold">mmHg</span></span>
                             </div>
                           </div>
                           <div className="card stat-mini shadow-sm border border-slate-100 flex items-center gap-4 p-5 rounded-2xl bg-white">
@@ -288,7 +288,7 @@ const PatientList = () => {
                                     <div key={i} className="condition-card bg-slate-50 border border-slate-100 rounded-xl p-4">
                                       <div className="flex justify-between items-center mb-2">
                                         <span className="font-bold text-xs text-slate-700">{c.name}</span>
-                                        <span className="text-[10px] font-bold text-slate-400">{c.probability}</span>
+                                        <span className="text-[10px] font-bold text-slate-400 font-mono">{c.probability}</span>
                                       </div>
                                       <div className="prob-bar bg-slate-200 h-1.5 rounded-full overflow-hidden">
                                         <div className="prob-fill bg-black h-1.5 rounded-full" style={{ width: c.probability }}></div>
@@ -376,7 +376,7 @@ const PatientList = () => {
                                 </div>
                                 <div>
                                   <strong className="text-sm text-slate-800 block">{app.reason}</strong>
-                                  <span className="text-xs text-slate-400 font-semibold">Assigned Specialist: Dr. {app.doctorId?.name || 'Staff'}</span>
+                                  <span className="text-xs text-slate-400 font-semibold">Assigned Specialist: {app.doctorId?.name?.startsWith('Dr.') ? app.doctorId.name : `Dr. ${app.doctorId?.name || 'Staff'}`}</span>
                                 </div>
                               </div>
                               <div className="flex items-center gap-4">
@@ -425,7 +425,7 @@ const PatientList = () => {
                                     <h4 className="font-bold text-sm text-slate-800">
                                       {pr.notes?.replace('Diagnosis: ', '') || 'Clinical Prescription'}
                                     </h4>
-                                    <span className="text-[10px] font-bold text-brand uppercase">Attending Doctor: Dr. {pr.doctorId?.name || 'Staff'}</span>
+                                    <span className="text-[10px] font-bold text-brand uppercase">Attending Doctor: {pr.doctorId?.name?.startsWith('Dr.') ? pr.doctorId.name : `Dr. ${pr.doctorId?.name || 'Staff'}`}</span>
                                   </div>
                                   <span className="text-xs text-slate-400 font-semibold">
                                     {new Date(pr.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
