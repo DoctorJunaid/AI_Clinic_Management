@@ -38,6 +38,23 @@ exports.getAppointments = async (req, res) => {
       query.doctorId = req.user.id;
     }
 
+    // Add date filtering if requested
+    if (req.query.date) {
+      const searchDate = new Date(req.query.date);
+      if (!isNaN(searchDate.getTime())) {
+        const startOfDay = new Date(searchDate);
+        startOfDay.setUTCHours(0, 0, 0, 0);
+        
+        const endOfDay = new Date(searchDate);
+        endOfDay.setUTCHours(23, 59, 59, 999);
+        
+        query.date = {
+          $gte: startOfDay,
+          $lte: endOfDay
+        };
+      }
+    }
+
     const appointments = await Appointment.find(query)
       .populate('patientId', 'name contact avatar')
       .populate('doctorId', 'name specialization')

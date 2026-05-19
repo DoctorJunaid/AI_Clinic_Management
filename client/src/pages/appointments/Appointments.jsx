@@ -41,17 +41,25 @@ const Appointments = () => {
   ];
 
   useEffect(() => {
-    fetchAppointments();
+    fetchAppointments(selectedCalendarDate);
     if (user?.role !== 'patient') {
       fetchPatients();
     } else {
       setSelectedPatient(user._id || user.id || '');
     }
-  }, [user]);
+  }, [user, selectedCalendarDate]);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = async (date) => {
+    setIsLoading(true);
     try {
-      const res = await axios.get('/api/v1/appointments');
+      const params = {};
+      if (date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        params.date = `${yyyy}-${mm}-${dd}`;
+      }
+      const res = await axios.get('/api/v1/appointments', { params });
       setAppointments(res.data.data);
     } catch (err) {
       toast.error('Failed to load appointments from server');
@@ -103,7 +111,7 @@ const Appointments = () => {
       };
 
       await axios.post('/api/v1/appointments', newApp);
-      fetchAppointments();
+      fetchAppointments(selectedCalendarDate);
       
       setSelectedPatient('');
       setAppointmentDate('');
@@ -181,7 +189,15 @@ const Appointments = () => {
       };
     });
 
-    let combined = [...seedAppointments];
+    // Only include seed appointments that match the selected calendar date
+    const matchingSeeds = seedAppointments.filter(seed => {
+      const seedDate = new Date(seed.date);
+      return seedDate.getFullYear() === selectedCalendarDate.getFullYear() &&
+             seedDate.getMonth() === selectedCalendarDate.getMonth() &&
+             seedDate.getDate() === selectedCalendarDate.getDate();
+    });
+
+    let combined = [...matchingSeeds];
 
     processedBackend.forEach(backendItem => {
       const exists = combined.some(seed => 
@@ -393,7 +409,7 @@ const Appointments = () => {
             ) : displayAppointments.length === 0 ? (
               <div className="py-12 text-center flex flex-col items-center justify-center">
                 <Calendar size={28} className="text-slate-200 mb-2" />
-                <h3 className="text-xs font-bold text-slate-600">No scheduled appointments</h3>
+                <h3 className="text-xs font-bold text-slate-600">No appointments scheduled</h3>
                 <p className="text-[10px] text-slate-400 mt-0.5 max-w-xs leading-normal">No entries match filters.</p>
               </div>
             ) : (
