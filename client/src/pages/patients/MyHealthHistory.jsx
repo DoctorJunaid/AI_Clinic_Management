@@ -74,8 +74,8 @@ const MyHealthHistory = () => {
     setAiExplanation('');
     try {
       const res = await axios.post('/api/v1/ai/explain-prescription', {
-        medicines: selectedPrescription.medications,
-        instructions: selectedPrescription.notes
+        medicines: selectedPrescription.medicines,
+        instructions: selectedPrescription.instructions
       });
       setAiExplanation(res.data.data.explanation);
       toast.success("AI clinical insights generated!");
@@ -146,7 +146,7 @@ const MyHealthHistory = () => {
                   )}
 
                   <div className="space-y-4">
-                    {selectedPrescription.medications?.map((med, idx) => (
+                    {selectedPrescription.medicines?.map((med, idx) => (
                       <div key={idx} className="border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
                         <h3 className="font-headline-xl text-lg font-bold text-slate-900 flex items-center gap-2">
                           <Pill className="text-slate-500" size={16} />
@@ -157,9 +157,9 @@ const MyHealthHistory = () => {
                         </p>
                       </div>
                     ))}
-                    {selectedPrescription.notes && (
+                    {selectedPrescription.instructions && (
                       <p className="text-slate-400 text-xs italic bg-slate-50 p-3 rounded-lg border border-slate-100 font-semibold leading-relaxed">
-                        <strong>Doctor Notes:</strong> {selectedPrescription.notes}
+                        <strong>Doctor Notes:</strong> {selectedPrescription.instructions}
                       </p>
                     )}
                   </div>

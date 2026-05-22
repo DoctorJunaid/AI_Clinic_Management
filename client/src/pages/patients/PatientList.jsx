@@ -189,6 +189,29 @@ const PatientList = () => {
     }
   };
 
+  const downloadPrescriptionPDF = async (id) => {
+    if (!id) return;
+    try {
+      toast.loading("Generating prescription PDF...");
+      const response = await axios.get(`/api/v1/prescriptions/${id}/pdf`, {
+        responseType: 'blob'
+      });
+      toast.dismiss();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `prescription-${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Prescription PDF downloaded successfully!");
+    } catch (error) {
+      toast.dismiss();
+      console.error("Error downloading prescription PDF", error);
+      toast.error("Failed to download prescription PDF");
+    }
+  };
+
   const handleAddPatient = (newPatient) => {
     setPatients([newPatient, ...patients]);
     setActivePatient(newPatient);
@@ -1020,6 +1043,13 @@ const PatientList = () => {
                               <p className="text-xs text-slate-500 font-medium italic">"{pr.instructions}"</p>
                             </div>
                           )}
+
+                          <button 
+                            onClick={() => downloadPrescriptionPDF(pr._id)}
+                            className="text-xs font-bold text-slate-800 hover:text-black flex items-center gap-1.5 mt-2 self-end border border-slate-200 bg-white hover:bg-slate-50 px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-sm"
+                          >
+                            <Download size={12} /> Download PDF
+                          </button>
                         </div>
                       </div>
                     ))}

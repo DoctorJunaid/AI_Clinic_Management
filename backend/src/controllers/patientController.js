@@ -18,15 +18,18 @@ exports.getPatients = async (req, res) => {
 // @access  Private
 exports.getPatient = async (req, res) => {
   try {
-    // Role-based Access Control: Patient can only view their own patient file
-    if (req.user.role === 'patient' && req.user.id !== req.params.id) {
-      return res.status(403).json({ success: false, message: 'Unauthorized to view this patient record' });
-    }
-
     const patient = await Patient.findById(req.params.id);
     if (!patient) {
       return res.status(404).json({ success: false, message: 'Patient not found' });
     }
+
+    // Role-based Access Control: Patient can only view their own patient file
+    if (req.user.role === 'patient') {
+      if (!patient.userId || patient.userId.toString() !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'Unauthorized to view this patient record' });
+      }
+    }
+
     res.status(200).json({ success: true, data: patient });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

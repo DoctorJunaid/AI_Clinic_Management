@@ -44,6 +44,10 @@ app.use('/api/v1/patients', dbCheckMiddleware, require('./src/routes/patientRout
 app.use('/api/v1/appointments', dbCheckMiddleware, require('./src/routes/appointmentRoutes'));
 app.use('/api/v1/prescriptions', dbCheckMiddleware, require('./src/routes/prescriptionRoutes'));
 app.use('/api/v1/ai', dbCheckMiddleware, require('./src/routes/aiRoutes'));
+app.use('/api/v1/analytics', dbCheckMiddleware, require('./src/routes/analyticsRoutes'));
+
+// Global Error Handler Middleware
+app.use(require('./src/middleware/errorHandler'));
 
 const startServer = async () => {
   console.log('🔄 Booting MedFlow Clinical Backend...');

@@ -21,7 +21,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'confirmed', 'completed', 'cancelled'],
+    enum: ['pending', 'confirmed', 'completed', 'cancelled', 'rescheduled', 'missed'],
     default: 'pending'
   },
   notes: {
@@ -35,5 +35,8 @@ const appointmentSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+// Create compound index for optimized schedule checks and slot availability queries
+appointmentSchema.index({ doctorId: 1, date: 1, timeSlot: 1 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema);

@@ -35,8 +35,8 @@ const seedData = async () => {
       email: 'admin@medflow.com',
       password: '123456',
       role: 'admin',
-      phone: '555-0100',
-      avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop',
+      phone: '03164593159',
+      avatar: 'https://www.muhammadjunaid.dev/_next/image?url=%2Fassets%2Fjunaid_img.webp',
       subscriptionPlan: 'pro',
       isActive: true
     });

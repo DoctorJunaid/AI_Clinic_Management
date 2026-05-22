@@ -155,14 +155,27 @@ const Treatments = () => {
     }
   };
 
-  const downloadPDF = (id) => {
-    // Open in a new tab to download
-    const token = localStorage.getItem('token');
-    const pdfUrl = `${axios.defaults.baseURL}/api/v1/prescriptions/${id}/pdf?token=${token}`;
-    
-    // We can open it directly
-    window.open(pdfUrl, '_blank');
-    toast.success('Downloading PDF...');
+  const downloadPDF = async (id) => {
+    if (!id) return;
+    try {
+      toast.loading("Generating prescription PDF...");
+      const response = await axios.get(`/api/v1/prescriptions/${id}/pdf`, {
+        responseType: 'blob'
+      });
+      toast.dismiss();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `prescription-${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success("Prescription PDF downloaded successfully!");
+    } catch (error) {
+      toast.dismiss();
+      console.error("Error downloading prescription PDF", error);
+      toast.error("Failed to download prescription PDF");
+    }
   };
 
   return (

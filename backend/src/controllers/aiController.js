@@ -1,15 +1,59 @@
 const axios = require('axios');
+const Patient = require('../models/Patient');
+const User = require('../models/User');
+const DiagnosisLog = require('../models/DiagnosisLog');
 
 // Array of Qwen models to try in order of preference
 const QWEN_MODELS = ['qwen-plus', 'qwen3-max', 'qwen3.5-122b-a10b'];
 
 // @desc    Smart Symptom Checker using Qwen AI with Fallback
 // @route   POST /api/v1/ai/symptom-check
-// @access  Private (Doctor)
+// @access  Private (Doctor, Admin, Receptionist)
 exports.symptomCheck = async (req, res) => {
   try {
-    const { symptoms = [], age = 30, gender = 'female', history = 'None' } = req.body;
+    const { patientId, symptoms = [], age = 30, gender = 'female', history = 'None' } = req.body;
     
+    if (!patientId) {
+      return res.status(400).json({ success: false, message: 'Please provide patientId' });
+    }
+
+    // Verify patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ success: false, message: 'Patient not found' });
+    }
+
+    // Determine patient subscription plan
+    let plan = 'free';
+    if (patient.userId) {
+      const patientUser = await User.findById(patient.userId);
+      if (patientUser) {
+        plan = patientUser.subscriptionPlan || 'free';
+      }
+    }
+
+    // If plan is free, enforce monthly limit of 3 checks using DiagnosisLog
+    if (plan === 'free') {
+      const startOfMonth = new Date();
+      startOfMonth.setUTCDate(1);
+      startOfMonth.setUTCHours(0, 0, 0, 0);
+
+      const monthlyCount = await DiagnosisLog.countDocuments({
+        patientId: patient._id,
+        createdAt: { $gte: startOfMonth }
+      });
+
+      if (monthlyCount >= 3) {
+        return res.status(403).json({
+          success: false,
+          message: 'Monthly limit of 3 AI symptom checks on the free plan has been reached. Please upgrade to Pro for unlimited diagnostics.'
+        });
+      }
+    }
+
+    let resultData = null;
+    let generatedBy = '';
+
     // High-Fidelity Mock Fallback if no API key is supplied
     if (!process.env.QWEN_API_KEY) {
       console.log('Qwen API key not found. Using high-fidelity local clinical diagnostic model.');
@@ -52,86 +96,107 @@ exports.symptomCheck = async (req, res) => {
         suggestedTests = ['Complete Blood Count (CBC)', 'Basic Metabolic Panel (BMP)'];
       }
 
-      return res.status(200).json({
-        success: true,
-        data: {
-          conditions,
-          riskLevel,
-          suggestedTests,
-          _generatedBy: 'MedFlow Clinical Local System'
-        }
-      });
-    }
-
-    const prompt = `Analyze these details: 
-      Symptoms: ${symptoms.join(', ')} 
-      Age: ${age}
-      Gender: ${gender}
-      History: ${history}
-      
-      Return ONLY a raw JSON object (no markdown formatting, no backticks) with: 
-      1. "conditions" (array of objects with "name" and "probability" percentage)
-      2. "riskLevel" (low, medium, high, critical)
-      3. "suggestedTests" (array of strings).`;
-
-    let responseText = null;
-    let successfulModel = null;
-    let lastError = null;
-
-    for (const model of QWEN_MODELS) {
-      try {
-        console.log(`Trying AI model: ${model}`);
+      resultData = {
+        conditions,
+        riskLevel,
+        suggestedTests
+      };
+      generatedBy = 'MedFlow Clinical Local System';
+    } else {
+      const prompt = `Analyze these details: 
+        Symptoms: ${symptoms.join(', ')} 
+        Age: ${age}
+        Gender: ${gender}
+        History: ${history}
         
-        const response = await axios.post(
-          'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
-          {
-            model: model,
-            messages: [
-              { role: 'system', content: 'You are an expert medical AI assistant.' },
-              { role: 'user', content: prompt }
-            ],
-            temperature: 0.2
-          },
-          {
-            headers: {
-              'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
-              'Content-Type': 'application/json'
+        Return ONLY a raw JSON object (no markdown formatting, no backticks) with: 
+        1. "conditions" (array of objects with "name" and "probability" percentage)
+        2. "riskLevel" (low, medium, high, critical)
+        3. "suggestedTests" (array of strings).`;
+
+      let responseText = null;
+      let successfulModel = null;
+      let lastError = null;
+
+      for (const model of QWEN_MODELS) {
+        try {
+          console.log(`Trying AI model: ${model}`);
+          
+          const response = await axios.post(
+            'https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions',
+            {
+              model: model,
+              messages: [
+                { role: 'system', content: 'You are an expert medical AI assistant.' },
+                { role: 'user', content: prompt }
+              ],
+              temperature: 0.2
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${process.env.QWEN_API_KEY}`,
+                'Content-Type': 'application/json'
+              }
             }
-          }
-        );
+          );
 
-        responseText = response.data.choices[0].message.content;
-        successfulModel = model;
-        break;
-        
-      } catch (error) {
-        lastError = error;
-        const status = error.response?.status;
-        console.warn(`Model ${model} failed with status: ${status}`);
-        
-        if (status === 429 || status === 403 || status >= 500 || error.code === 'ECONNABORTED') {
-          console.log(`Falling back to next model...`);
-          continue; 
-        } else {
-          throw error;
+          responseText = response.data.choices[0].message.content;
+          successfulModel = model;
+          break;
+          
+        } catch (error) {
+          lastError = error;
+          const status = error.response?.status;
+          console.warn(`Model ${model} failed with status: ${status}`);
+          
+          if (status === 429 || status === 403 || status >= 500 || error.code === 'ECONNABORTED') {
+            console.log(`Falling back to next model...`);
+            continue; 
+          } else {
+            throw error;
+          }
         }
+      }
+
+      if (!responseText) {
+        throw lastError || new Error("All AI models failed");
+      }
+
+      try {
+        const jsonStr = responseText.replace(/```json|```/g, '').trim();
+        resultData = JSON.parse(jsonStr);
+        generatedBy = successfulModel; 
+      } catch(e) {
+        resultData = { error: 'Failed to parse AI response', raw: responseText };
+        generatedBy = successfulModel;
       }
     }
 
-    if (!responseText) {
-      throw lastError || new Error("All AI models failed");
-    }
+    // Save to DiagnosisLog
+    const logRisk = (resultData.riskLevel || 'low').toLowerCase();
+    const validRisks = ['low', 'medium', 'high', 'critical'];
+    const normalizedRisk = validRisks.includes(logRisk) ? logRisk : 'low';
 
-    let aiData;
-    try {
-      const jsonStr = responseText.replace(/```json|```/g, '').trim();
-      aiData = JSON.parse(jsonStr);
-      aiData._generatedBy = successfulModel; 
-    } catch(e) {
-       aiData = { error: 'Failed to parse AI response', raw: responseText, _generatedBy: successfulModel };
-    }
+    await DiagnosisLog.create({
+      patientId: patient._id,
+      doctorId: req.user.id,
+      symptoms,
+      age: Number(age) || patient.age,
+      gender: gender || patient.gender,
+      patientHistory: history || patient.medicalHistory || 'None',
+      aiResponse: JSON.stringify(resultData),
+      conditions: resultData.conditions || [],
+      riskLevel: normalizedRisk,
+      suggestedTests: resultData.suggestedTests || []
+    });
 
-    res.status(200).json({ success: true, data: aiData });
+    res.status(200).json({
+      success: true,
+      data: {
+        ...resultData,
+        _generatedBy: generatedBy
+      }
+    });
     
   } catch (error) {
     console.error("AI Error:", error.response?.data || error.message);

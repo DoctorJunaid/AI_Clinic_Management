@@ -24,35 +24,36 @@ const Appointments = () => {
   
   // Book Appointment Form State
   const [selectedPatient, setSelectedPatient] = useState('');
+  const [selectedDoctor, setSelectedDoctor] = useState('');
   const [appointmentDate, setAppointmentDate] = useState('');
-  const [timeSlot, setTimeSlot] = useState('09:00 AM - 09:30 AM');
+  const [timeSlot, setTimeSlot] = useState('');
   const [notes, setNotes] = useState('');
+
+  // Doctors & Slots state
+  const [doctors, setDoctors] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   // Selected date on mini calendar
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date()); 
-
-  const timeSlots = [
-    '09:00 AM - 09:30 AM',
-    '09:30 AM - 10:00 AM',
-    '10:00 AM - 10:30 AM',
-    '10:30 AM - 11:00 AM',
-    '11:00 AM - 11:30 AM',
-    '11:30 AM - 12:00 PM',
-    '02:00 PM - 02:30 PM',
-    '02:30 PM - 03:00 PM',
-    '03:00 PM - 03:30 PM',
-    '03:30 PM - 04:00 PM',
-    '04:00 PM - 04:30 PM'
-  ];
 
   useEffect(() => {
     fetchAppointments(selectedCalendarDate);
     if (user?.role !== 'patient') {
       fetchPatients();
+      fetchDoctors();
     } else {
       setSelectedPatient(user._id || user.id || '');
     }
   }, [user, selectedCalendarDate]);
+
+  useEffect(() => {
+    if (selectedDoctor && appointmentDate) {
+      fetchAvailableSlots(selectedDoctor, appointmentDate);
+    } else {
+      setAvailableSlots([]);
+    }
+  }, [selectedDoctor, appointmentDate]);
 
   const fetchAppointments = async (date) => {
     setIsLoading(true);
@@ -82,6 +83,42 @@ const Appointments = () => {
     }
   };
 
+  const fetchDoctors = async () => {
+    try {
+      const res = await axios.get('/api/v1/auth/users');
+      const allUsers = res.data.data || res.data || [];
+      const docs = allUsers.filter(u => u.role === 'doctor');
+      setDoctors(docs);
+      if (docs.length > 0) {
+        setSelectedDoctor(docs[0]._id);
+      }
+    } catch (err) {
+      console.error('Failed to load doctors list', err);
+    }
+  };
+
+  const fetchAvailableSlots = async (docId, dateStr) => {
+    setLoadingSlots(true);
+    try {
+      const res = await axios.get('/api/v1/appointments/slots', {
+        params: { doctorId: docId, date: dateStr }
+      });
+      const slots = res.data.data || [];
+      setAvailableSlots(slots);
+      
+      const firstAvail = slots.find(s => s.available);
+      if (firstAvail) {
+        setTimeSlot(firstAvail.timeSlot);
+      } else {
+        setTimeSlot('');
+      }
+    } catch (err) {
+      console.error('Failed to fetch slots', err);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
+
   const handleStatusChange = async (id, newStatus) => {
     try {
       await axios.put(`/api/v1/appointments/${id}/status`, { status: newStatus });
@@ -95,21 +132,15 @@ const Appointments = () => {
   const handleBookAppointment = async (e) => {
     if (e) e.preventDefault();
     const patientId = user?.role === 'patient' ? (user._id || user.id) : selectedPatient;
-    if (!patientId || !appointmentDate || !timeSlot) {
+    if (!patientId || !selectedDoctor || !appointmentDate || !timeSlot) {
       toast.error('Please complete all required fields');
       return;
     }
 
     try {
-      let doctorId = 'mock_doctor_id_56789';
-      if (user?.role !== 'patient') {
-        const docRes = await axios.get('/api/v1/auth/me');
-        doctorId = docRes.data.data._id;
-      }
-
       const newApp = {
         patientId: patientId,
-        doctorId: doctorId,
+        doctorId: selectedDoctor,
         date: new Date(appointmentDate).toISOString(),
         timeSlot: timeSlot,
         notes: notes
@@ -135,47 +166,6 @@ const Appointments = () => {
     }
   };
 
-  const getTodaySeedDateStr = () => {
-    const today = new Date();
-    return new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-  };
-
-  const seedAppointments = [
-    {
-      _id: 'seed-1',
-      patientId: { name: 'Sarah Jenkins' },
-      notes: 'Annual Checkup',
-      timeSlot: '09:00 AM',
-      date: getTodaySeedDateStr(),
-      status: 'in progress',
-      doctor: 'Dr. Aris Thorne',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-      isSeed: true
-    },
-    {
-      _id: 'seed-2',
-      patientId: { name: 'Marcus Rodriguez' },
-      notes: 'Blood Test Results',
-      timeSlot: '10:30 AM',
-      date: getTodaySeedDateStr(),
-      status: 'pending',
-      doctor: 'Lab Room B',
-      initials: 'MR',
-      isSeed: true
-    },
-    {
-      _id: 'seed-3',
-      patientId: { name: 'David Chen' },
-      notes: 'Consultation',
-      timeSlot: '11:15 AM',
-      date: getTodaySeedDateStr(),
-      status: 'confirmed',
-      doctor: 'Dr. Aris Thorne',
-      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
-      isSeed: true
-    }
-  ];
-
   const parseTime = (timeStr) => {
     if (!timeStr) return 0;
     const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
@@ -189,7 +179,7 @@ const Appointments = () => {
   };
 
   const getTimelineAppointments = () => {
-    const processedBackend = (appointments || []).map(app => {
+    let combined = (appointments || []).map(app => {
       const firstSlotPart = app.timeSlot ? String(app.timeSlot).split('-')[0].trim() : '09:00 AM';
       return {
         _id: app._id,
@@ -198,30 +188,9 @@ const Appointments = () => {
         timeSlot: firstSlotPart,
         date: app.date,
         status: app.status,
-        doctor: 'Dr. Aris Thorne',
+        doctor: app.doctorId?.name || 'Dr. Thorne',
         isSeed: false
       };
-    });
-
-    const matchingSeeds = seedAppointments.filter(seed => {
-      const seedDate = new Date(seed.date);
-      return seedDate.getFullYear() === selectedCalendarDate.getFullYear() &&
-             seedDate.getMonth() === selectedCalendarDate.getMonth() &&
-             seedDate.getDate() === selectedCalendarDate.getDate();
-    });
-
-    let combined = [...matchingSeeds];
-
-    processedBackend.forEach(backendItem => {
-      const exists = combined.some(seed => {
-        const seedName = seed.patientId?.name || '';
-        const backendName = backendItem.patientId?.name || '';
-        return seedName.toLowerCase() === backendName.toLowerCase() &&
-               seed.timeSlot === backendItem.timeSlot;
-      });
-      if (!exists) {
-        combined.push(backendItem);
-      }
     });
 
     if (filterStatus !== 'all') {
@@ -502,13 +471,48 @@ const Appointments = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                  <label className="field-label">Time Slot</label>
-                  <select className="input-field" value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} required>
-                    {timeSlots.map(slot => (
-                      <option key={slot} value={slot}>{slot}</option>
-                    ))}
-                  </select>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                    <label className="field-label">Doctor</label>
+                    <select 
+                      className="input-field" 
+                      value={selectedDoctor} 
+                      onChange={(e) => setSelectedDoctor(e.target.value)} 
+                      required
+                    >
+                      <option value="">-- Choose Doctor --</option>
+                      {doctors.map(doc => (
+                        <option key={doc._id} value={doc._id}>Dr. {doc.name} ({doc.specialization || 'General'})</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                    <label className="field-label">Time Slot</label>
+                    <select 
+                      className="input-field" 
+                      value={timeSlot} 
+                      onChange={(e) => setTimeSlot(e.target.value)} 
+                      required
+                      disabled={loadingSlots || availableSlots.length === 0}
+                    >
+                      {loadingSlots ? (
+                        <option>Loading available slots...</option>
+                      ) : availableSlots.length === 0 ? (
+                        <option value="">-- Choose doctor & date --</option>
+                      ) : (
+                        availableSlots.map(slot => (
+                          <option 
+                            key={slot.timeSlot} 
+                            value={slot.timeSlot} 
+                            disabled={!slot.available}
+                          >
+                            {slot.timeSlot} {!slot.available ? '(Booked)' : ''}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>

@@ -14,22 +14,62 @@ const PatientAppointmentsView = () => {
   // Booking Modal State
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const [appointmentDate, setAppointmentDate] = useState('');
-  const [timeSlot, setTimeSlot] = useState('09:00 AM - 09:30 AM');
+  const [timeSlot, setTimeSlot] = useState('');
   const [notes, setNotes] = useState('');
 
-  const timeSlots = [
-    '09:00 AM - 09:30 AM',
-    '09:30 AM - 10:00 AM',
-    '10:00 AM - 10:30 AM',
-    '10:30 AM - 11:00 AM',
-    '11:00 AM - 11:30 AM',
-    '11:30 AM - 12:00 PM',
-    '02:00 PM - 02:30 PM',
-    '02:30 PM - 03:00 PM',
-    '03:00 PM - 03:30 PM',
-    '03:30 PM - 04:00 PM',
-    '04:00 PM - 04:30 PM'
-  ];
+  // Live Doctors & Dynamic Slots state
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState('');
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    fetchDoctors();
+  }, []);
+
+  useEffect(() => {
+    if (selectedDoctor && appointmentDate) {
+      fetchAvailableSlots(selectedDoctor, appointmentDate);
+    } else {
+      setAvailableSlots([]);
+    }
+  }, [selectedDoctor, appointmentDate]);
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await axios.get('/api/v1/auth/users');
+      const allUsers = res.data.data || res.data || [];
+      const docs = allUsers.filter(u => u.role === 'doctor');
+      setDoctors(docs);
+      if (docs.length > 0) {
+        setSelectedDoctor(docs[0]._id);
+      }
+    } catch (err) {
+      console.error('Failed to load doctors list', err);
+    }
+  };
+
+  const fetchAvailableSlots = async (docId, dateStr) => {
+    setLoadingSlots(true);
+    try {
+      const res = await axios.get('/api/v1/appointments/slots', {
+        params: { doctorId: docId, date: dateStr }
+      });
+      const slots = res.data.data || [];
+      setAvailableSlots(slots);
+      
+      const firstAvail = slots.find(s => s.available);
+      if (firstAvail) {
+        setTimeSlot(firstAvail.timeSlot);
+      } else {
+        setTimeSlot('');
+      }
+    } catch (err) {
+      console.error('Failed to fetch slots', err);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
 
   useEffect(() => {
     fetchMyAppointments();
@@ -52,18 +92,6 @@ const PatientAppointmentsView = () => {
         });
       }
 
-      if (data.length === 0) {
-        data.push({
-          _id: 'dummy-1',
-          date: new Date(Date.now() + 86400000 * 2).toISOString(),
-          timeSlot: '10:00 AM - 10:30 AM',
-          doctor: 'Dr. Aris Thorne',
-          notes: 'Routine Health Checkup',
-          status: 'confirmed',
-          patientId: { name: user?.name }
-        });
-      }
-
       setAppointments(data);
     } catch (err) {
       toast.error('Failed to load your appointments');
@@ -76,18 +104,15 @@ const PatientAppointmentsView = () => {
     if (e) e.preventDefault();
     const patientId = user?._id || user?.id;
     
-    if (!appointmentDate || !timeSlot) {
+    if (!selectedDoctor || !appointmentDate || !timeSlot) {
       toast.error('Please complete all required fields');
       return;
     }
 
     try {
-      // Mock doctor ID for now, or fetch from available doctors
-      const doctorId = 'mock_doctor_id_56789';
-
       const newApp = {
         patientId: patientId,
-        doctorId: doctorId,
+        doctorId: selectedDoctor,
         date: new Date(appointmentDate).toISOString(),
         timeSlot: timeSlot,
         notes: notes
@@ -180,7 +205,7 @@ const PatientAppointmentsView = () => {
               <div className="pa-card-body">
                 <div className="pa-doctor">
                   <User size={14} className="text-muted" />
-                  {app.doctor || 'Assigned Doctor'}
+                  {app.doctorId?.name || app.doctor || 'Assigned Doctor'}
                 </div>
                 {app.notes && (
                   <div className="pa-notes">
@@ -230,6 +255,21 @@ const PatientAppointmentsView = () => {
                     />
                   </div>
 
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-700">Doctor</label>
+                    <select 
+                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
+                      value={selectedDoctor} 
+                      onChange={(e) => setSelectedDoctor(e.target.value)} 
+                      required
+                    >
+                      <option value="">-- Choose Doctor --</option>
+                      {doctors.map(doc => (
+                        <option key={doc._id} value={doc._id}>Dr. {doc.name} ({doc.specialization || 'General'})</option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-bold text-slate-700">Date</label>
@@ -248,10 +288,23 @@ const PatientAppointmentsView = () => {
                         value={timeSlot} 
                         onChange={(e) => setTimeSlot(e.target.value)} 
                         required
+                        disabled={loadingSlots || availableSlots.length === 0}
                       >
-                        {timeSlots.map(slot => (
-                          <option key={slot} value={slot}>{slot}</option>
-                        ))}
+                        {loadingSlots ? (
+                          <option>Loading slots...</option>
+                        ) : availableSlots.length === 0 ? (
+                          <option value="">Choose doctor & date</option>
+                        ) : (
+                          availableSlots.map(slot => (
+                            <option 
+                              key={slot.timeSlot} 
+                              value={slot.timeSlot} 
+                              disabled={!slot.available}
+                            >
+                              {slot.timeSlot} {!slot.available ? '(Booked)' : ''}
+                            </option>
+                          ))
+                        )}
                       </select>
                     </div>
                   </div>

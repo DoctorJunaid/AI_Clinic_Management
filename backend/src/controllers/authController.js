@@ -1,6 +1,5 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -8,26 +7,14 @@ const generateToken = (id) => {
   });
 };
 
+// @desc    Register a new user (Doctor, Receptionist, Patient)
+// @route   POST /api/v1/auth/register
+// @access  Public / Admin (to create staff)
 exports.register = async (req, res) => {
   try {
     const { name, email, password, role, phone, specialization } = req.body;
 
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(201).json({
-        success: true,
-        token: 'mock-jwt-token-for-demo-purposes-only',
-        user: {
-          _id: 'mock_user_' + Date.now(),
-          name,
-          email,
-          role: role || 'patient',
-          subscriptionPlan: 'free'
-        }
-      });
-    }
-
     const userExists = await User.findOne({ email });
-
     if (userExists) {
       return res.status(400).json({ success: false, message: 'User already exists' });
     }
@@ -37,8 +24,8 @@ exports.register = async (req, res) => {
       email,
       password,
       role: role || 'patient',
-      phone,
-      specialization
+      phone: phone || '',
+      specialization: specialization || ''
     });
 
     res.status(201).json({
@@ -57,6 +44,9 @@ exports.register = async (req, res) => {
   }
 };
 
+// @desc    Log in user
+// @route   POST /api/v1/auth/login
+// @access  Public
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -66,15 +56,17 @@ exports.login = async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select('+password');
-
     if (!user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     const isMatch = await user.matchPassword(password);
-
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    if (!user.isActive) {
+      return res.status(403).json({ success: false, message: 'Your account is deactivated' });
     }
 
     res.status(200).json({
@@ -94,54 +86,57 @@ exports.login = async (req, res) => {
   }
 };
 
+// @desc    Get current logged in user details
+// @route   GET /api/v1/auth/me
+// @access  Private
 exports.getMe = async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      let mockUser = {
-        _id: 'mock_admin_id_12345',
-        name: 'Muhammad Junaid',
-        email: 'admin@medflow.com',
-        role: 'admin',
-        subscriptionPlan: 'pro',
-        avatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&h=150&fit=crop'
-      };
-
-      if (req.user && req.user.id === 'mock_doctor_id_56789') {
-        mockUser = {
-          _id: 'mock_doctor_id_56789',
-          name: 'Dr. Sarah Ahmed',
-          email: 'doctor@medflow.com',
-          role: 'doctor',
-          subscriptionPlan: 'pro',
-          avatar: 'https://images.unsplash.com/photo-1594824813573-246434de83fb?w=150&h=150&fit=crop'
-        };
-      } else if (req.user && req.user.id === 'mock_receptionist_id_98765') {
-        mockUser = {
-          _id: 'mock_receptionist_id_98765',
-          name: 'Sobia Khan (Reception)',
-          email: 'reception@medflow.com',
-          role: 'receptionist',
-          subscriptionPlan: 'pro',
-          avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop'
-        };
-      } else if (req.user && req.user.id === 'mock_patient_id_55555') {
-        mockUser = {
-          _id: 'mock_patient_id_55555',
-          name: 'Sarah Jenkins',
-          email: 'patient@medflow.com',
-          role: 'patient',
-          subscriptionPlan: 'free',
-          avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop'
-        };
-      }
-
-      return res.status(200).json({
-        success: true,
-        data: mockUser
-      });
-    }
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
     res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Update user profile settings
+// @route   PUT /api/v1/auth/update-profile
+// @access  Private
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, phone, specialization, password } = req.body;
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (specialization !== undefined) user.specialization = specialization;
+    
+    if (password) {
+      user.password = password; // Will be encrypted by userSchema pre-save hook
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        subscriptionPlan: user.subscriptionPlan,
+        phone: user.phone,
+        specialization: user.specialization
+      }
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -157,14 +152,6 @@ exports.updateSubscription = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid subscription plan' });
     }
 
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(200).json({
-        success: true,
-        message: 'Subscription updated successfully',
-        data: { subscriptionPlan: plan }
-      });
-    }
-
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
@@ -176,7 +163,13 @@ exports.updateSubscription = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Subscription updated successfully',
-      data: user
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        subscriptionPlan: user.subscriptionPlan
+      }
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -188,10 +181,6 @@ exports.updateSubscription = async (req, res) => {
 // @access  Private (Admin)
 exports.getAllUsers = async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(200).json({ success: true, data: [] });
-    }
-    // Fetch all users who are doctors or receptionists
     const users = await User.find({ role: { $in: ['doctor', 'receptionist'] } }).select('-password');
     res.status(200).json({ success: true, data: users });
   } catch (error) {
@@ -204,9 +193,6 @@ exports.getAllUsers = async (req, res) => {
 // @access  Private (Admin)
 exports.deleteUser = async (req, res) => {
   try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(200).json({ success: true, message: 'User deleted (Sandbox)' });
-    }
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
