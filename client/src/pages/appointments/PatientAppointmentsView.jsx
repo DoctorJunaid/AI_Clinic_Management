@@ -263,10 +263,12 @@ const PatientAppointmentsView = () => {
                       onChange={(e) => setSelectedDoctor(e.target.value)} 
                       required
                     >
-                      <option value="">-- Choose Doctor --</option>
-                      {doctors.map(doc => (
-                        <option key={doc._id} value={doc._id}>Dr. {doc.name} ({doc.specialization || 'General'})</option>
-                      ))}
+                      {doctors.map(doc => {
+                        const displayName = doc.name.startsWith('Dr.') ? doc.name : `Dr. ${doc.name}`;
+                        return (
+                          <option key={doc._id} value={doc._id}>{displayName} ({doc.specialization || 'General'})</option>
+                        );
+                      })}
                     </select>
                   </div>
 
