@@ -434,7 +434,7 @@
 
 .modal-card {
   background: #ffffff;
-  border-radius: var(--r-2xl);
+  border-radius: 12px;
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
   width: 100%;
@@ -443,6 +443,18 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+}
+
+/* Modal-specific inputs & button overrides */
+.modal-card .input-field,
+.modal-card select,
+.modal-card input,
+.modal-card textarea {
+  border-radius: 4px !important;
+}
+
+.modal-card .btn {
+  border-radius: 4px !important;
 }
 
 .modal-header {
@@ -481,7 +493,7 @@
   width: 100%;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: 4px;
   font-family: var(--font-sans);
   font-size: 0.8125rem;
   color: var(--text-primary);

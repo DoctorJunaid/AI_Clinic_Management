@@ -12,7 +12,7 @@ import {
   Brain,
   Zap
 } from 'lucide-react';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import PricingModal from '../common/PricingModal';
 import logoImg from '../../assets/logo.png';
@@ -50,6 +50,21 @@ const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const [isPricingOpen, setIsPricingOpen] = useState(false);
 
+  const [clinicName, setClinicName] = useState(localStorage.getItem('clinic_name') || 'Saylani Clinic');
+  const [clinicLogo, setClinicLogo] = useState(localStorage.getItem('clinic_logo') || logoImg);
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setClinicName(localStorage.getItem('clinic_name') || 'Saylani Clinic');
+      setClinicLogo(localStorage.getItem('clinic_logo') || logoImg);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -58,17 +73,17 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       {/* Brand */}
-      <div className="sidebar-brand">
+      <div className="sidebar-brand" style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
         <img
-          src={logoImg}
-          alt="Saylani Clinic"
-          style={{ width: '26px', height: '26px', objectFit: 'contain', flexShrink: 0 }}
+          src={clinicLogo}
+          alt={clinicName}
+          style={{ width: '26px', height: '26px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
         />
         <div className="brand-text">
-          <span className="brand-name">
-            SAYLANI<span style={{ color: 'var(--brand-500)' }}>.</span>
+          <span className="brand-name" style={{ fontSize: '0.8125rem', fontWeight: 800, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '120px', display: 'block' }}>
+            {clinicName.toUpperCase()}
           </span>
-          <span className="brand-sub">AI Clinic</span>
+          <span className="brand-sub" style={{ fontSize: '0.625rem', color: 'var(--text-muted)' }}>AI Clinic</span>
         </div>
       </div>
 
@@ -184,9 +199,10 @@ const Sidebar = () => {
       {/* User row */}
       <div className="sidebar-user">
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'MJ')}&background=e4e4e7&color=3f3f46&bold=true&size=60`}
+          src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'MJ')}&background=e4e4e7&color=3f3f46&bold=true&size=60`}
           alt="Profile"
           className="user-avatar"
+          style={{ objectFit: 'cover' }}
         />
         <div className="user-meta">
           <span className="user-name">{user?.name || 'Muhammad Junaid'}</span>

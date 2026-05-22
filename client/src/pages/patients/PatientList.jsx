@@ -9,6 +9,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import AddPatientModal from '../../components/common/AddPatientModal';
+import FileUpload from '../../components/common/FileUpload';
 import '../../components/common/Modal.css';
 import './Patients.css';
 
@@ -63,11 +64,15 @@ const PatientList = () => {
     respiratoryRate: '',
     bloodGroup: '',
     address: '',
-    avatar: ''
+    avatar: '',
+    avatarPublicId: ''
   });
   const [scanForm, setScanForm] = useState({
     name: '',
-    url: ''
+    url: '',
+    publicId: '',
+    fileType: '',
+    size: 0
   });
   const [prescriptionForm, setPrescriptionForm] = useState({
     instructions: '',
@@ -149,7 +154,8 @@ const PatientList = () => {
         respiratoryRate: currentVitals.respiratoryRate || 16,
         bloodGroup: activePatient.bloodGroup || 'O-',
         address: activePatient.address || '',
-        avatar: activePatient.avatar || ''
+        avatar: activePatient.avatar || '',
+        avatarPublicId: activePatient.avatarPublicId || ''
       });
     }
   }, [activePatient]);
@@ -267,6 +273,7 @@ const PatientList = () => {
         bloodGroup: vitalsForm.bloodGroup,
         address: vitalsForm.address,
         avatar: vitalsForm.avatar,
+        avatarPublicId: vitalsForm.avatarPublicId,
         vitals: {
           heartRate: Number(vitalsForm.heartRate),
           bloodPressure: vitalsForm.bloodPressure,
@@ -289,7 +296,7 @@ const PatientList = () => {
   const handleUploadScanSubmit = async (e) => {
     e.preventDefault();
     if (!scanForm.name.trim() || !scanForm.url.trim()) {
-      toast.error('Please enter a valid scan name and image URL');
+      toast.error('Please upload a file and enter a valid scan label');
       return;
     }
     try {
@@ -297,6 +304,9 @@ const PatientList = () => {
       const newScan = {
         name: scanForm.name,
         url: scanForm.url,
+        publicId: scanForm.publicId,
+        fileType: scanForm.fileType,
+        size: scanForm.size,
         date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
       };
       const updatedScans = [...existingScans, newScan];
@@ -309,7 +319,7 @@ const PatientList = () => {
       setPatients(patients.map(p => p._id === activePatient._id ? updatedPatient : p));
       setActivePatient(updatedPatient);
       setIsScanUploadModalOpen(false);
-      setScanForm({ name: '', url: '' });
+      setScanForm({ name: '', url: '', publicId: '', fileType: '', size: 0 });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error saving scan');
     }
@@ -1145,13 +1155,16 @@ const PatientList = () => {
               </div>
 
               <div className="input-group col-span-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Patient Picture URL (Optional)</label>
-                <input 
-                  type="url" 
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold outline-none focus:border-slate-400" 
-                  placeholder="e.g. https://domain.com/pic.jpg"
-                  value={vitalsForm.avatar} 
-                  onChange={e => setVitalsForm({...vitalsForm, avatar: e.target.value})} 
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Patient Profile Picture (Optional)</label>
+                <FileUpload
+                  type="avatar"
+                  accept="image/*"
+                  maxSize={2 * 1024 * 1024}
+                  label="Drag and drop profile photo or click"
+                  value={vitalsForm.avatar}
+                  publicId={vitalsForm.avatarPublicId}
+                  onUploadSuccess={({ url, publicId }) => setVitalsForm({ ...vitalsForm, avatar: url, avatarPublicId: publicId })}
+                  onRemove={() => setVitalsForm({ ...vitalsForm, avatar: '', avatarPublicId: '' })}
                 />
               </div>
 
@@ -1277,42 +1290,29 @@ const PatientList = () => {
               </div>
 
               <div className="input-group">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Image URL (High Resolution)</label>
-                <input 
-                  type="url" 
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs font-bold outline-none focus:border-slate-400" 
-                  required
-                  placeholder="https://images.unsplash.com/... or relative path"
-                  value={scanForm.url} 
-                  onChange={e => setScanForm({...scanForm, url: e.target.value})} 
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Upload File (Image/Scan or PDF Report)</label>
+                <FileUpload
+                  type="document"
+                  accept="image/*,application/pdf"
+                  maxSize={10 * 1024 * 1024}
+                  label="Drag & drop radiology scan or PDF report here"
+                  value={scanForm.url}
+                  publicId={scanForm.publicId}
+                  onUploadSuccess={({ url, publicId, fileType, size }) => setScanForm({
+                    ...scanForm,
+                    url,
+                    publicId,
+                    fileType,
+                    size
+                  })}
+                  onRemove={() => setScanForm({
+                    ...scanForm,
+                    url: '',
+                    publicId: '',
+                    fileType: '',
+                    size: 0
+                  })}
                 />
-              </div>
-
-              <div className="bg-slate-50 border border-slate-150 p-3 rounded-lg text-slate-500">
-                <span className="text-[9px] font-bold text-slate-450 uppercase tracking-wider block mb-0.5">Quick Presets</span>
-                <div className="flex gap-1.5 flex-wrap mt-1">
-                  <button 
-                    type="button" 
-                    onClick={() => setScanForm({ name: 'Chest X-ray (Repeat)', url: 'https://images.unsplash.com/photo-1559757175-5700def837be?w=400&h=250&fit=crop' })}
-                    className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-[9px] font-bold border border-slate-200 cursor-pointer"
-                  >
-                    Chest X-Ray
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setScanForm({ name: 'CT Abdomen', url: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=400&h=250&fit=crop' })}
-                    className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-[9px] font-bold border border-slate-200 cursor-pointer"
-                  >
-                    CT Abdomen
-                  </button>
-                  <button 
-                    type="button" 
-                    onClick={() => setScanForm({ name: 'Ultrasound Pelvic', url: 'https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=400&h=250&fit=crop' })}
-                    className="px-2 py-1 rounded bg-white hover:bg-slate-100 text-[9px] font-bold border border-slate-200 cursor-pointer"
-                  >
-                    Ultrasound
-                  </button>
-                </div>
               </div>
 
               <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-slate-100">

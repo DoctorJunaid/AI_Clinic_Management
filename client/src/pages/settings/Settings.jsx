@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -6,9 +6,12 @@ import {
   User, Shield, CreditCard, Paintbrush, 
   Building, Save, Check, Plus, Trash2 
 } from 'lucide-react';
+import { AuthContext } from '../../context/AuthContext';
+import FileUpload from '../../components/common/FileUpload';
 import './Settings.css';
 
 const Settings = () => {
+  const { loadUser } = useContext(AuthContext);
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('profile');
@@ -17,10 +20,14 @@ const Settings = () => {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [specialization, setSpecialization] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [avatarPublicId, setAvatarPublicId] = useState('');
   
   const [clinicName, setClinicName] = useState('Saylani Clinic.');
   const [clinicAddress, setClinicAddress] = useState('Gulshan-e-Iqbal, Karachi, Pakistan');
   const [clinicPhone, setClinicPhone] = useState('0300-1112233');
+  const [clinicLogo, setClinicLogo] = useState('');
+  const [clinicLogoPublicId, setClinicLogoPublicId] = useState('');
   
   const [themeMode, setThemeMode] = useState('light');
   const [subscriptionPlan, setSubscriptionPlan] = useState('pro');
@@ -37,6 +44,18 @@ const Settings = () => {
 
   useEffect(() => {
     fetchProfile();
+    // Load clinic configs from localStorage
+    const storedName = localStorage.getItem('clinic_name');
+    const storedAddress = localStorage.getItem('clinic_address');
+    const storedPhone = localStorage.getItem('clinic_phone');
+    const storedLogo = localStorage.getItem('clinic_logo');
+    const storedLogoPublicId = localStorage.getItem('clinic_logo_public_id');
+
+    if (storedName) setClinicName(storedName);
+    if (storedAddress) setClinicAddress(storedAddress);
+    if (storedPhone) setClinicPhone(storedPhone);
+    if (storedLogo) setClinicLogo(storedLogo);
+    if (storedLogoPublicId) setClinicLogoPublicId(storedLogoPublicId);
   }, []);
 
   const fetchProfile = async () => {
@@ -47,6 +66,8 @@ const Settings = () => {
       setName(user.name);
       setPhone(user.phone || '');
       setSpecialization(user.specialization || '');
+      setAvatar(user.avatar || '');
+      setAvatarPublicId(user.avatarPublicId || '');
       const storedPlan = localStorage.getItem('demo_saas_plan');
       setSubscriptionPlan(storedPlan || user.subscriptionPlan || 'pro');
 
@@ -75,13 +96,17 @@ const Settings = () => {
       await axios.put('/api/v1/auth/update-profile', {
         name,
         phone,
-        specialization
+        specialization,
+        avatar,
+        avatarPublicId
       });
-      setCurrentUser({ ...currentUser, name, phone, specialization });
+      setCurrentUser({ ...currentUser, name, phone, specialization, avatar, avatarPublicId });
       toast.success('Profile details updated successfully!');
+      if (loadUser) await loadUser();
     } catch (err) {
-      setCurrentUser({ ...currentUser, name, phone, specialization });
+      setCurrentUser({ ...currentUser, name, phone, specialization, avatar, avatarPublicId });
       toast.success('Profile details updated successfully (Sandbox Mode)!');
+      if (loadUser) await loadUser();
     }
   };
 
@@ -144,7 +169,14 @@ const Settings = () => {
 
   const handleSaveClinicSettings = (e) => {
     e.preventDefault();
+    localStorage.setItem('clinic_name', clinicName);
+    localStorage.setItem('clinic_address', clinicAddress);
+    localStorage.setItem('clinic_phone', clinicPhone);
+    localStorage.setItem('clinic_logo', clinicLogo);
+    localStorage.setItem('clinic_logo_public_id', clinicLogoPublicId);
     toast.success('Clinic configurations saved successfully!');
+    // Trigger real-time storage event for the sidebar to pick up the logo immediately
+    window.dispatchEvent(new Event('storage'));
   };
 
   const renderSection = () => {
@@ -164,25 +196,48 @@ const Settings = () => {
               <p>Loading profile...</p>
             ) : (
               <form onSubmit={handleUpdateProfile} className="form-stack">
-                <div className="field-group">
-                  <label className="field-label">Full Name</label>
-                  <input type="text" className="input-field" value={name} onChange={(e) => setName(e.target.value)} required />
-                </div>
-                <div className="form-row">
-                  <div className="field-group">
-                    <label className="field-label">Contact Number</label>
-                    <input type="text" className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                  <div style={{ width: '130px', flexShrink: 0 }}>
+                    <label className="field-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Profile Photo</label>
+                    <FileUpload
+                      type="avatar"
+                      accept="image/*"
+                      maxSize={2 * 1024 * 1024}
+                      label="Upload Photo"
+                      value={avatar}
+                      publicId={avatarPublicId}
+                      onUploadSuccess={({ url, publicId }) => {
+                        setAvatar(url);
+                        setAvatarPublicId(publicId);
+                      }}
+                      onRemove={() => {
+                        setAvatar('');
+                        setAvatarPublicId('');
+                      }}
+                    />
                   </div>
-                  <div className="field-group">
-                    <label className="field-label">Specialization / Role</label>
-                    <input type="text" className="input-field" value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="e.g. Pediatrics" disabled={currentUser?.role !== 'doctor' && currentUser?.role !== 'admin'} />
+                  <div style={{ flex: 1, minWidth: '250px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="field-group">
+                      <label className="field-label">Full Name</label>
+                      <input type="text" className="input-field" value={name} onChange={(e) => setName(e.target.value)} required />
+                    </div>
+                    <div className="form-row">
+                      <div className="field-group">
+                        <label className="field-label">Contact Number</label>
+                        <input type="text" className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                      </div>
+                      <div className="field-group">
+                        <label className="field-label">Specialization / Role</label>
+                        <input type="text" className="input-field" value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="e.g. Pediatrics" disabled={currentUser?.role !== 'doctor' && currentUser?.role !== 'admin'} />
+                      </div>
+                    </div>
+                    <div className="field-group">
+                      <label className="field-label">Email Address</label>
+                      <input type="email" className="input-field" value={currentUser?.email || ''} disabled />
+                    </div>
                   </div>
                 </div>
-                <div className="field-group">
-                  <label className="field-label">Email Address</label>
-                  <input type="email" className="input-field" value={currentUser?.email || ''} disabled />
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
                   <button type="submit" className="btn btn-primary">
                     <Save size={14} /> Save Changes
                   </button>
@@ -205,19 +260,42 @@ const Settings = () => {
               <h3 className="section-title">Clinic Information</h3>
             </div>
             <form onSubmit={handleSaveClinicSettings} className="form-stack">
-              <div className="field-group">
-                <label className="field-label">Clinic Name</label>
-                <input type="text" className="input-field" value={clinicName} onChange={(e) => setClinicName(e.target.value)} required />
+              <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                <div style={{ width: '130px', flexShrink: 0 }}>
+                  <label className="field-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Clinic Logo</label>
+                  <FileUpload
+                    type="avatar"
+                    accept="image/*"
+                    maxSize={2 * 1024 * 1024}
+                    label="Upload Logo"
+                    value={clinicLogo}
+                    publicId={clinicLogoPublicId}
+                    onUploadSuccess={({ url, publicId }) => {
+                      setClinicLogo(url);
+                      setClinicLogoPublicId(publicId);
+                    }}
+                    onRemove={() => {
+                      setClinicLogo('');
+                      setClinicLogoPublicId('');
+                    }}
+                  />
+                </div>
+                <div style={{ flex: 1, minWidth: '250px', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div className="field-group">
+                    <label className="field-label">Clinic Name</label>
+                    <input type="text" className="input-field" value={clinicName} onChange={(e) => setClinicName(e.target.value)} required />
+                  </div>
+                  <div className="field-group">
+                    <label className="field-label">Clinic Address</label>
+                    <input type="text" className="input-field" value={clinicAddress} onChange={(e) => setClinicAddress(e.target.value)} required />
+                  </div>
+                  <div className="field-group">
+                    <label className="field-label">Primary Phone</label>
+                    <input type="text" className="input-field" value={clinicPhone} onChange={(e) => setClinicPhone(e.target.value)} required />
+                  </div>
+                </div>
               </div>
-              <div className="field-group">
-                <label className="field-label">Clinic Address</label>
-                <input type="text" className="input-field" value={clinicAddress} onChange={(e) => setClinicAddress(e.target.value)} required />
-              </div>
-              <div className="field-group">
-                <label className="field-label">Primary Phone</label>
-                <input type="text" className="input-field" value={clinicPhone} onChange={(e) => setClinicPhone(e.target.value)} required />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid var(--border)', paddingTop: '1rem', marginTop: '0.5rem' }}>
                 <button type="submit" className="btn btn-primary">
                   <Save size={14} /> Save Settings
                 </button>

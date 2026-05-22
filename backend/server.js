@@ -40,6 +40,7 @@ app.get('/', (req, res) => {
 
 // Import Routes (applied robust database connection check)
 app.use('/api/v1/auth', dbCheckMiddleware, require('./src/routes/authRoutes'));
+app.use('/api/v1/uploads', dbCheckMiddleware, require('./src/routes/uploadRoutes'));
 app.use('/api/v1/patients', dbCheckMiddleware, require('./src/routes/patientRoutes'));
 app.use('/api/v1/appointments', dbCheckMiddleware, require('./src/routes/appointmentRoutes'));
 app.use('/api/v1/prescriptions', dbCheckMiddleware, require('./src/routes/prescriptionRoutes'));

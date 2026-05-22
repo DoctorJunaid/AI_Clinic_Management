@@ -3,6 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import FileUpload from './FileUpload';
 
 const AddPatientModal = ({ onClose, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -13,7 +14,8 @@ const AddPatientModal = ({ onClose, onSuccess }) => {
     address: '',
     bloodGroup: '',
     medicalHistory: '',
-    avatar: ''
+    avatar: '',
+    avatarPublicId: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -87,9 +89,17 @@ const AddPatientModal = ({ onClose, onSuccess }) => {
           </div>
 
           <div className="input-group col-span-2">
-            <label className="input-label">Patient Picture URL (Optional)</label>
-            <input type="url" className="input-field" placeholder="e.g. https://domain.com/pic.jpg"
-              onChange={e => setFormData({...formData, avatar: e.target.value})} />
+            <label className="input-label">Patient Profile Picture (Optional)</label>
+            <FileUpload
+              type="avatar"
+              accept="image/*"
+              maxSize={2 * 1024 * 1024}
+              label="Drag and drop profile photo or click"
+              value={formData.avatar}
+              publicId={formData.avatarPublicId}
+              onUploadSuccess={({ url, publicId }) => setFormData({ ...formData, avatar: url, avatarPublicId: publicId })}
+              onRemove={() => setFormData({ ...formData, avatar: '', avatarPublicId: '' })}
+            />
           </div>
           
           <div className="input-group col-span-2">

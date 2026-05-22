@@ -67,10 +67,10 @@ const Header = () => {
         </button>
 
         <img
-          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'MJ')}&background=e4e4e7&color=3f3f46&bold=true&size=60`}
+          src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'MJ')}&background=e4e4e7&color=3f3f46&bold=true&size=60`}
           alt="Profile"
           className="header-avatar"
-          style={{ display: 'block' }}
+          style={{ display: 'block', objectFit: 'cover' }}
         />
       </div>
     </header>

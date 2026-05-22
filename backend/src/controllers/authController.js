@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { deleteFromCloudinary } = require('./uploadController');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -106,7 +107,7 @@ exports.getMe = async (req, res) => {
 // @access  Private
 exports.updateProfile = async (req, res) => {
   try {
-    const { name, email, phone, specialization, password } = req.body;
+    const { name, email, phone, specialization, password, avatar, avatarPublicId } = req.body;
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -117,6 +118,14 @@ exports.updateProfile = async (req, res) => {
     if (email) user.email = email;
     if (phone !== undefined) user.phone = phone;
     if (specialization !== undefined) user.specialization = specialization;
+    if (avatar !== undefined) user.avatar = avatar;
+
+    if (avatarPublicId !== undefined && avatarPublicId !== user.avatarPublicId) {
+      if (user.avatarPublicId) {
+        await deleteFromCloudinary(user.avatarPublicId);
+      }
+      user.avatarPublicId = avatarPublicId;
+    }
     
     if (password) {
       user.password = password; // Will be encrypted by userSchema pre-save hook
@@ -134,7 +143,9 @@ exports.updateProfile = async (req, res) => {
         role: user.role,
         subscriptionPlan: user.subscriptionPlan,
         phone: user.phone,
-        specialization: user.specialization
+        specialization: user.specialization,
+        avatar: user.avatar,
+        avatarPublicId: user.avatarPublicId
       }
     });
   } catch (error) {
@@ -196,6 +207,9 @@ exports.deleteUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    if (user.avatarPublicId) {
+      await deleteFromCloudinary(user.avatarPublicId);
     }
     await user.deleteOne();
     res.status(200).json({ success: true, message: 'Staff member removed successfully' });

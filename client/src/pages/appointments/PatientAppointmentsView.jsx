@@ -228,7 +228,7 @@ const PatientAppointmentsView = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col"
+              className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden flex flex-col"
             >
               <div className="p-6 border-b border-slate-100 flex justify-between items-start">
                 <div>
@@ -249,7 +249,7 @@ const PatientAppointmentsView = () => {
                     <label className="text-xs font-bold text-slate-700">Patient</label>
                     <input 
                       type="text" 
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-500 cursor-not-allowed" 
+                      className="w-full bg-slate-50 border border-slate-200 rounded px-4 py-2.5 text-sm font-semibold text-slate-500 cursor-not-allowed" 
                       value={user?.name || ''} 
                       disabled 
                     />
@@ -258,7 +258,7 @@ const PatientAppointmentsView = () => {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-700">Doctor</label>
                     <select 
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
+                      className="w-full bg-white border border-slate-200 rounded px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
                       value={selectedDoctor} 
                       onChange={(e) => setSelectedDoctor(e.target.value)} 
                       required
@@ -277,7 +277,7 @@ const PatientAppointmentsView = () => {
                       <label className="text-xs font-bold text-slate-700">Date</label>
                       <input 
                         type="date" 
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
+                        className="w-full bg-white border border-slate-200 rounded px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
                         value={appointmentDate} 
                         onChange={(e) => setAppointmentDate(e.target.value)} 
                         required 
@@ -286,7 +286,7 @@ const PatientAppointmentsView = () => {
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-bold text-slate-700">Time Slot</label>
                       <select 
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
+                        className="w-full bg-white border border-slate-200 rounded px-4 py-2.5 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black" 
                         value={timeSlot} 
                         onChange={(e) => setTimeSlot(e.target.value)} 
                         required
@@ -314,7 +314,7 @@ const PatientAppointmentsView = () => {
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-700">Symptoms / Reason</label>
                     <textarea 
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black resize-none min-h-[100px]" 
+                      className="w-full bg-white border border-slate-200 rounded px-4 py-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-black focus:ring-1 focus:ring-black resize-none min-h-[100px]" 
                       placeholder="e.g. routine check-up, headache..."
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
@@ -323,7 +323,7 @@ const PatientAppointmentsView = () => {
 
                   <button 
                     type="submit" 
-                    className="w-full bg-black hover:bg-slate-800 text-white transition-colors py-3.5 rounded-full text-sm font-bold mt-2"
+                    className="w-full bg-black hover:bg-slate-800 text-white transition-colors py-3.5 rounded text-sm font-bold mt-2"
                   >
                     Confirm Scheduling
                   </button>

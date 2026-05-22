@@ -34,6 +34,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  avatarPublicId: {
+    type: String,
+    default: ''
+  },
   specialization: {
     type: String,
     default: '' // Only for doctors

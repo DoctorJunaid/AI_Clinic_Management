@@ -24,18 +24,34 @@ exports.getAppointments = async (req, res) => {
 
     // Add date filtering if requested
     if (req.query.date) {
-      const searchDate = new Date(req.query.date);
-      if (!isNaN(searchDate.getTime())) {
-        const startOfDay = new Date(searchDate);
-        startOfDay.setUTCHours(0, 0, 0, 0);
+      let startOfDay, endOfDay;
+      const dateParts = req.query.date.split('-');
+      if (dateParts.length === 3) {
+        const year = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1;
+        const day = parseInt(dateParts[2], 10);
         
-        const endOfDay = new Date(searchDate);
-        endOfDay.setUTCHours(23, 59, 59, 999);
+        startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+        endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
         
         query.date = {
           $gte: startOfDay,
           $lte: endOfDay
         };
+      } else {
+        const searchDate = new Date(req.query.date);
+        if (!isNaN(searchDate.getTime())) {
+          startOfDay = new Date(searchDate);
+          startOfDay.setUTCHours(0, 0, 0, 0);
+          
+          endOfDay = new Date(searchDate);
+          endOfDay.setUTCHours(23, 59, 59, 999);
+          
+          query.date = {
+            $gte: startOfDay,
+            $lte: endOfDay
+          };
+        }
       }
     }
 
@@ -69,12 +85,25 @@ exports.createAppointment = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Doctor not found' });
     }
 
-    // Normalize date to compare
-    const searchDate = new Date(date);
-    const startOfDay = new Date(searchDate);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(searchDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    // Normalize date to compare safely in UTC without timezone offset shifts
+    let startOfDay, endOfDay, dbDate;
+    const dateParts = typeof date === 'string' ? date.split('T')[0].split('-') : [];
+    if (dateParts.length === 3) {
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1;
+      const day = parseInt(dateParts[2], 10);
+      
+      startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+      endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
+      dbDate = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+    } else {
+      const searchDate = new Date(date);
+      startOfDay = new Date(searchDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      endOfDay = new Date(searchDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
+      dbDate = searchDate;
+    }
 
     // Double booking check: is this doctor already booked at this date and slot?
     const existing = await Appointment.findOne({
@@ -97,7 +126,7 @@ exports.createAppointment = async (req, res) => {
     const appointment = await Appointment.create({
       patientId,
       doctorId,
-      date: searchDate,
+      date: dbDate,
       timeSlot,
       notes: notes || '',
       createdBy: req.user.id
@@ -158,10 +187,29 @@ exports.getAvailableSlots = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Doctor not found' });
     }
 
-    const searchDate = new Date(date);
-    if (isNaN(searchDate.getTime())) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid date' });
+    // Parse date safely to avoid timezone offset shifts
+    let startOfDay, endOfDay;
+    const dateParts = typeof date === 'string' ? date.split('T')[0].split('-') : [];
+    if (dateParts.length === 3) {
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1;
+      const day = parseInt(dateParts[2], 10);
+      
+      startOfDay = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+      endOfDay = new Date(Date.UTC(year, month, day, 23, 59, 59, 999));
+    } else {
+      const searchDate = new Date(date);
+      if (isNaN(searchDate.getTime())) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid date' });
+      }
+      startOfDay = new Date(searchDate);
+      startOfDay.setUTCHours(0, 0, 0, 0);
+      endOfDay = new Date(searchDate);
+      endOfDay.setUTCHours(23, 59, 59, 999);
     }
+
+    console.log(`[Diagnostic] getAvailableSlots called for doctorId=${doctorId}, date=${date}`);
+    console.log(`[Diagnostic] Query bounds UTC: startOfDay=${startOfDay.toISOString()}, endOfDay=${endOfDay.toISOString()}`);
 
     // Define standard slot intervals (9 AM to 5 PM, omitting break 12 PM - 2 PM)
     const baseSlots = [
@@ -180,12 +228,6 @@ exports.getAvailableSlots = async (req, res) => {
       '04:30 PM - 05:00 PM'
     ];
 
-    // Get start and end of that day in UTC
-    const startOfDay = new Date(searchDate);
-    startOfDay.setUTCHours(0, 0, 0, 0);
-    const endOfDay = new Date(searchDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
-
     // Find all active appointments for this doctor on this day
     const appointments = await Appointment.find({
       doctorId,
@@ -196,12 +238,16 @@ exports.getAvailableSlots = async (req, res) => {
       status: { $in: ['pending', 'confirmed', 'completed', 'rescheduled'] }
     });
 
+    console.log(`[Diagnostic] Found ${appointments.length} appointments for doctor on this day`);
+
     const bookedSlots = appointments.map(app => app.timeSlot);
 
     const slots = baseSlots.map(slot => ({
       timeSlot: slot,
       available: !bookedSlots.includes(slot)
     }));
+
+    console.log(`[Diagnostic] Generated slots:`, slots.map(s => `${s.timeSlot}: ${s.available ? 'Free' : 'Booked'}`));
 
     res.status(200).json({ success: true, data: slots });
   } catch (error) {

@@ -1,5 +1,6 @@
 const Patient = require('../models/Patient');
 const mongoose = require('mongoose');
+const { deleteFromCloudinary } = require('./uploadController');
 
 // @desc    Get all patients
 // @route   GET /api/v1/patients
@@ -60,6 +61,31 @@ exports.updatePatient = async (req, res) => {
 
     if (!patient) {
       return res.status(404).json({ success: false, message: 'Patient not found' });
+    }
+
+    // Role-based Access Control: Patient can only update their own file
+    if (req.user.role === 'patient') {
+      if (!patient.userId || patient.userId.toString() !== req.user.id) {
+        return res.status(403).json({ success: false, message: 'Unauthorized to update this patient record' });
+      }
+    }
+
+    // Prevent orphan avatar uploads on replace
+    if (req.body.avatarPublicId !== undefined && req.body.avatarPublicId !== patient.avatarPublicId) {
+      if (patient.avatarPublicId) {
+        await deleteFromCloudinary(patient.avatarPublicId);
+      }
+    }
+
+    // Prevent orphan scan uploads on delete
+    if (req.body.scans && Array.isArray(req.body.scans)) {
+      const existingScans = patient.scans || [];
+      const newScanPublicIds = req.body.scans.map(s => s.publicId).filter(Boolean);
+      for (const scan of existingScans) {
+        if (scan.publicId && !newScanPublicIds.includes(scan.publicId)) {
+          await deleteFromCloudinary(scan.publicId);
+        }
+      }
     }
 
     patient = await Patient.findByIdAndUpdate(req.params.id, req.body, {
