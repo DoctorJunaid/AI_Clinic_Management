@@ -1,21 +1,54 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, LineChart, Legend, Line } from 'recharts';
-import { Users, Calendar as CalendarIcon, Activity, TrendingUp, MoreHorizontal, ArrowUpRight, ArrowDownRight, Clock, Brain, Lock } from 'lucide-react';
+import {
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, LineChart, Legend, Line
+} from 'recharts';
+import {
+  Users, Calendar as CalendarIcon, Activity, TrendingUp,
+  MoreHorizontal, ArrowUpRight, ArrowDownRight, Clock, Brain, Lock
+} from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
 import PricingModal from '../../components/common/PricingModal';
-import MyHealthHistory from '../patients/MyHealthHistory';
+import PatientDashboard from './PatientDashboard';
 import './Dashboard.css';
 
-const data = [
+const weeklyData = [
   { name: 'Mon', appointments: 12, newPatients: 4 },
   { name: 'Tue', appointments: 19, newPatients: 7 },
   { name: 'Wed', appointments: 15, newPatients: 5 },
   { name: 'Thu', appointments: 22, newPatients: 8 },
   { name: 'Fri', appointments: 18, newPatients: 6 },
   { name: 'Sat', appointments: 10, newPatients: 3 },
-  { name: 'Sun', appointments: 5, newPatients: 1 },
+  { name: 'Sun', appointments: 5,  newPatients: 1 },
 ];
+
+const outbreakData = [
+  { week: 'Wk 20', Influenza: 15, Dengue: 4,  Gastro: 25 },
+  { week: 'Wk 21', Influenza: 28, Dengue: 8,  Gastro: 30 },
+  { week: 'Wk 22', Influenza: 45, Dengue: 15, Gastro: 28 },
+  { week: 'Wk 23', Influenza: 62, Dengue: 32, Gastro: 35 },
+  { week: 'Wk 24', Influenza: 50, Dengue: 58, Gastro: 45 },
+  { week: 'Wk 25', Influenza: 35, Dengue: 72, Gastro: 52 },
+  { week: 'Wk 26', Influenza: 22, Dengue: 85, Gastro: 58 },
+];
+
+const appointments = [
+  { id: 1, name: 'Aisha Bibi',     type: 'General Checkup', time: '10:00 AM', status: 'confirmed',   img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=faces' },
+  { id: 2, name: 'Muhammad Ali',  type: 'Follow-up',        time: '11:30 AM', status: 'in-progress', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=faces' },
+  { id: 3, name: 'Zainab Fatima', type: 'Vaccination',      time: '02:00 PM', status: 'pending',     img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=faces' },
+  { id: 4, name: 'Bilal Khan',    type: 'Lab Results',      time: '04:15 PM', status: 'pending',     img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=faces' },
+];
+
+// Shared animation variants — fast, purposeful
+const fadeUp = {
+  hidden: { opacity: 0, y: 6 },
+  show:   { opacity: 1, y: 0 },
+};
+
+const stagger = {
+  show: { transition: { staggerChildren: 0.06 } },
+};
 
 const StatCard = ({ title, value, change, icon: Icon, isIncrease, delay }) => (
   <motion.div 
@@ -44,41 +77,59 @@ const StatCard = ({ title, value, change, icon: Icon, isIncrease, delay }) => (
   </motion.div>
 );
 
+// Tooltip styling shared
+const tooltipStyle = {
+  borderRadius: '8px',
+  border: '1px solid var(--border)',
+  boxShadow: 'var(--shadow-md)',
+  background: 'var(--surface)',
+  fontSize: '12px',
+};
+
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
 
-  if (user?.role === 'patient') {
-    return <MyHealthHistory />;
-  }
+  if (user?.role === 'patient') return <PatientDashboard />;
 
   const [isPricingOpen, setIsPricingOpen] = useState(false);
-
   const [forecastViews, setForecastViews] = useState(() => {
-    const todayKey = 'ai_forecasting_views_' + new Date().toISOString().split('T')[0];
-    const val = localStorage.getItem(todayKey);
+    const key = 'ai_forecasting_views_' + new Date().toISOString().split('T')[0];
+    const val = localStorage.getItem(key);
     return val ? parseInt(val, 10) : 0;
   });
 
   useEffect(() => {
     if (user?.subscriptionPlan !== 'pro') {
-      const todayKey = 'ai_forecasting_views_' + new Date().toISOString().split('T')[0];
-      const current = localStorage.getItem(todayKey);
-      const nextViews = current ? parseInt(current, 10) + 1 : 1;
-      localStorage.setItem(todayKey, nextViews.toString());
-      setForecastViews(nextViews);
+      const key = 'ai_forecasting_views_' + new Date().toISOString().split('T')[0];
+      const curr = localStorage.getItem(key);
+      const next = curr ? parseInt(curr, 10) + 1 : 1;
+      localStorage.setItem(key, next.toString());
+      setForecastViews(next);
     }
   }, [user?.subscriptionPlan]);
 
+  const isPastLimit = user?.subscriptionPlan !== 'pro' && forecastViews > 3;
+
   return (
     <div className="dashboard">
-      <div className="grid grid-cols-4 dashboard-stats">
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-4 gap-6 dashboard-stats">
         <StatCard title="Total Patients" value="1,284" change={12.5} icon={Users} isIncrease={true} delay={0} />
         <StatCard title="Appointments" value="84" change={5.2} icon={CalendarIcon} isIncrease={true} delay={0.1} />
         <StatCard title="Treatments" value="64" change={-2.4} icon={Activity} isIncrease={false} delay={0.2} />
         <StatCard title="Revenue" value="PKR 85,000" change={8.4} icon={TrendingUp} isIncrease={true} delay={0.3} />
       </div>
 
-      <div className="grid grid-cols-3 mt-4 dashboard-main">
+      {/* Charts Row */}
+      <motion.div
+        className="grid grid-cols-3 gap-6 dashboard-main"
+        variants={stagger}
+        initial="hidden"
+        animate="show"
+        transition={{ delay: 0.1 }}
+      >
+        {/* Patient Flow Chart */}
         <motion.div 
           className="card col-span-2 chart-card"
           initial={{ opacity: 0, y: 20 }}
@@ -90,14 +141,14 @@ const Dashboard = () => {
               <h2 className="card-title">Patient Flow Overview</h2>
               <p className="text-muted text-xs mt-2">Activity for the current week</p>
             </div>
-            <select className="input-field select-sm w-auto">
+            <select className="select-sm">
               <option>This Week</option>
               <option>This Month</option>
             </select>
           </div>
           <div className="chart-container" style={{ height: '320px', marginTop: '1rem' }}>
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
+              <AreaChart data={weeklyData} margin={{ top: 10, right: 10, bottom: 0, left: -20 }}>
                 <defs>
                   <linearGradient id="colorAppt" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#496800" stopOpacity={0.3}/>
@@ -123,24 +174,27 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        <motion.div 
+        {/* Today's Schedule */}
+        <motion.div
           className="card"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.5, ease: 'easeOut' }}
+          variants={fadeUp}
+          transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
         >
           <div className="card-header">
             <h2 className="card-title">Today's Schedule</h2>
-            <button className="btn btn-ghost text-xs font-semibold p-2">View All</button>
+            <button className="btn btn-ghost text-xs" style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}>
+              View all
+            </button>
           </div>
           <div className="appointment-list">
-            {[
-              { id: 1, name: 'Aisha Bibi', type: 'General Checkup', time: '10:00 AM', status: 'confirmed', img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=faces' },
-              { id: 2, name: 'Muhammad Ali', type: 'Follow up', time: '11:30 AM', status: 'in-progress', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=faces' },
-              { id: 3, name: 'Zainab Fatima', type: 'Vaccination', time: '02:00 PM', status: 'pending', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=faces' },
-              { id: 4, name: 'Bilal Khan', type: 'Lab Results', time: '04:15 PM', status: 'pending', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=faces' },
-            ].map((apt) => (
-              <div key={apt.id} className="appointment-item">
+            {appointments.map((apt, i) => (
+              <motion.div
+                key={apt.id}
+                className="appointment-item"
+                initial={{ opacity: 0, x: -4 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.18, delay: 0.3 + i * 0.05, ease: [0.16, 1, 0.3, 1] }}
+              >
                 <img src={apt.img} alt={apt.name} className="apt-avatar" />
                 <div className="apt-details">
                   <h4>{apt.name}</h4>
@@ -148,20 +202,19 @@ const Dashboard = () => {
                 </div>
                 <div className="apt-meta">
                   <div className="apt-time">
-                    <Clock size={12} />
+                    <Clock size={10} />
                     {apt.time}
                   </div>
                   <span className={`apt-status status-${apt.status}`}>
                     {apt.status.replace('-', ' ')}
                   </span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      {/* SECOND ROW: AI PREDICTIVE OUTBREAK FORECASTING */}
       <div className="grid grid-cols-1 mt-4">
         <motion.div
           className="card chart-card p-6 rounded-2xl flex flex-col gap-4 shadow-sm"
@@ -269,15 +322,7 @@ const Dashboard = () => {
             <div className="chart-container" style={{ height: '280px', marginTop: '0.5rem' }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={[
-                    { week: 'Wk 20', Influenza: 15, Dengue: 4, Gastro: 25 },
-                    { week: 'Wk 21', Influenza: 28, Dengue: 8, Gastro: 30 },
-                    { week: 'Wk 22', Influenza: 45, Dengue: 15, Gastro: 28 },
-                    { week: 'Wk 23', Influenza: 62, Dengue: 32, Gastro: 35 },
-                    { week: 'Wk 24', Influenza: 50, Dengue: 58, Gastro: 45 },
-                    { week: 'Wk 25', Influenza: 35, Dengue: 72, Gastro: 52 },
-                    { week: 'Wk 26', Influenza: 22, Dengue: 85, Gastro: 58 },
-                  ]}
+                  data={outbreakData}
                   margin={{ top: 10, right: 30, left: -10, bottom: 0 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
@@ -298,7 +343,6 @@ const Dashboard = () => {
         </motion.div>
       </div>
 
-      {/* Pricing Modal Overlay */}
       <PricingModal isOpen={isPricingOpen} onClose={() => setIsPricingOpen(false)} />
     </div>
   );

@@ -3,13 +3,18 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Calendar, Clock, Filter, Search, ChevronRight, ChevronLeft, Sparkles, X
+  Calendar, Clock, Filter, Search, ChevronRight, ChevronLeft, X, Plus
 } from 'lucide-react';
 import { AuthContext } from '../../context/AuthContext';
+import PatientAppointmentsView from './PatientAppointmentsView';
 import './Appointments.css';
 
 const Appointments = () => {
   const { user } = useContext(AuthContext);
+
+  if (user?.role === 'patient') {
+    return <PatientAppointmentsView />;
+  }
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +29,7 @@ const Appointments = () => {
   const [notes, setNotes] = useState('');
 
   // Selected date on mini calendar
-  const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date()); // default to today's date so it loads dynamic current data
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState(new Date()); 
 
   const timeSlots = [
     '09:00 AM - 09:30 AM',
@@ -60,7 +65,7 @@ const Appointments = () => {
         params.date = `${yyyy}-${mm}-${dd}`;
       }
       const res = await axios.get('/api/v1/appointments', { params });
-      setAppointments(res.data.data);
+      setAppointments(res.data.data || res.data || []);
     } catch (err) {
       toast.error('Failed to load appointments from server');
     } finally {
@@ -71,7 +76,7 @@ const Appointments = () => {
   const fetchPatients = async () => {
     try {
       const res = await axios.get('/api/v1/patients');
-      setPatients(res.data.data);
+      setPatients(res.data.data || res.data || []);
     } catch (err) {
       console.error('Failed to load patient records');
     }
@@ -112,7 +117,6 @@ const Appointments = () => {
 
       await axios.post('/api/v1/appointments', newApp);
       
-      // Auto-switch calendar selection to the booked date so the user sees it immediately!
       if (appointmentDate) {
         const parts = appointmentDate.split('-');
         const bookedDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
@@ -131,7 +135,6 @@ const Appointments = () => {
     }
   };
 
-  // Pre-seeded timeline records matching the high-fidelity mock
   const getTodaySeedDateStr = () => {
     const today = new Date();
     return new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
@@ -147,8 +150,7 @@ const Appointments = () => {
       status: 'in progress',
       doctor: 'Dr. Aris Thorne',
       avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-      isSeed: true,
-      timeRelative: 'Started 12m ago'
+      isSeed: true
     },
     {
       _id: 'seed-2',
@@ -186,10 +188,9 @@ const Appointments = () => {
     return hrs * 60 + mins;
   };
 
-  // Re-map and merge backend appointments
   const getTimelineAppointments = () => {
-    const processedBackend = appointments.map(app => {
-      const firstSlotPart = app.timeSlot ? app.timeSlot.split('-')[0].trim() : '09:00 AM';
+    const processedBackend = (appointments || []).map(app => {
+      const firstSlotPart = app.timeSlot ? String(app.timeSlot).split('-')[0].trim() : '09:00 AM';
       return {
         _id: app._id,
         patientId: app.patientId || { name: 'Guest Patient' },
@@ -197,12 +198,11 @@ const Appointments = () => {
         timeSlot: firstSlotPart,
         date: app.date,
         status: app.status,
-        doctor: 'Dr. Aris Thorne', // default fallback physician
+        doctor: 'Dr. Aris Thorne',
         isSeed: false
       };
     });
 
-    // Only include seed appointments that match the selected calendar date
     const matchingSeeds = seedAppointments.filter(seed => {
       const seedDate = new Date(seed.date);
       return seedDate.getFullYear() === selectedCalendarDate.getFullYear() &&
@@ -261,62 +261,55 @@ const Appointments = () => {
     const paddingArray = Array.from({ length: firstDayIndex }, () => null);
     const allDays = [...paddingArray, ...daysArray];
 
-    const handlePrevMonth = () => {
-      setSelectedCalendarDate(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth() - 1, 1));
-    };
-    
-    const handleNextMonth = () => {
-      setSelectedCalendarDate(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth() + 1, 1));
-    };
+    const handlePrevMonth = () => setSelectedCalendarDate(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth() - 1, 1));
+    const handleNextMonth = () => setSelectedCalendarDate(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth() + 1, 1));
 
     const hasDot = (day) => {
       const today = new Date();
-      // Highlight days with seeded/booked appointments for maximum feedback
       if (selectedCalendarDate.getMonth() === today.getMonth() && selectedCalendarDate.getFullYear() === today.getFullYear()) {
         return [today.getDate(), today.getDate() + 1].includes(day);
-      }
-      if (selectedCalendarDate.getMonth() === 9 && selectedCalendarDate.getFullYear() === 2023) {
-        return [2, 6, 10, 12, 19, 26].includes(day);
       }
       return day % 5 === 0 || day % 7 === 2;
     };
 
     return (
-      <div className="bg-white rounded-[24px] p-6 border border-slate-100/80 shadow-xs flex flex-col gap-4">
-        <div className="flex justify-between items-center px-1">
-          <h3 className="text-[15px] font-bold text-slate-800 font-heading">
+      <div className="calendar-card">
+        <div className="calendar-header">
+          <h3 className="calendar-month">
             {monthNames[selectedCalendarDate.getMonth()]} {selectedCalendarDate.getFullYear()}
           </h3>
-          <div className="flex gap-2">
-            <button onClick={handlePrevMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors duration-150 cursor-pointer">
-              <ChevronLeft size={16} className="text-slate-600" />
+          <div className="calendar-nav-btns">
+            <button onClick={handlePrevMonth} className="icon-btn">
+              <ChevronLeft size={16} />
             </button>
-            <button onClick={handleNextMonth} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors duration-150 cursor-pointer">
-              <ChevronRight size={16} className="text-slate-600" />
+            <button onClick={handleNextMonth} className="icon-btn">
+              <ChevronRight size={16} />
             </button>
           </div>
         </div>
         
-        <div className="grid grid-cols-7 gap-y-1.5 text-center mb-2">
+        <div className="calendar-days-header">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map(d => (
-            <span key={d} className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{d}</span>
+            <span key={d} className="calendar-day-label">{d}</span>
           ))}
         </div>
-        <div className="grid grid-cols-7 gap-y-1 text-center">
+        <div className="calendar-grid">
           {allDays.map((day, idx) => {
-            if (day === null) return <span key={`pad-${idx}`} className="py-2 text-slate-200" />;
+            if (day === null) return <span key={`pad-${idx}`} />;
             const isSelected = day === selectedCalendarDate.getDate();
+            const isToday = day === new Date().getDate() && selectedCalendarDate.getMonth() === new Date().getMonth() && selectedCalendarDate.getFullYear() === new Date().getFullYear();
+            
             return (
               <div 
                 key={`day-${day}`} 
                 onClick={() => setSelectedCalendarDate(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), day))}
-                className="flex flex-col items-center justify-center relative py-1 cursor-pointer"
+                className="calendar-cell-wrapper"
               >
-                <span className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-xs font-semibold transition-all duration-150 ${isSelected ? 'bg-black text-white font-bold shadow-sm' : 'text-slate-600 hover:bg-slate-50'}`}>
+                <div className={`calendar-cell ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''}`}>
                   {day}
-                </span>
+                </div>
                 {hasDot(day) && (
-                  <span className={`absolute bottom-0 w-1 h-1 rounded-full ${isSelected ? 'bg-[#c8f17a]' : 'bg-slate-300'}`} />
+                  <span className="calendar-dot brand" />
                 )}
               </div>
             );
@@ -328,304 +321,208 @@ const Appointments = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      className="p-2 md:p-4 max-w-[1600px] mx-auto min-h-screen flex flex-col gap-4"
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className="appointments-page"
     >
-      {/* Top Header Bar */}
-      <div className="flex justify-between items-center mb-4 border-b border-slate-100/60 pb-4">
-        <div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-900 font-heading">Reception Desk</h1>
-          <p className="text-[11px] text-slate-400 font-medium mt-0.5">Register clinic walk-ins, schedule appointments, and coordinate daily physician timelines.</p>
-        </div>
+      <div className="appointments-header">
+        <h1 className="appointments-title">Reception Desk</h1>
+        <p className="appointments-subtitle">Register clinic walk-ins, schedule appointments, and coordinate daily physician timelines.</p>
       </div>
 
-      {/* Main Column Grid */}
-      <div className="grid appointments-appointments-grid gap-5 items-start">
+      <div className="appointments-grid">
         
-        {/* Booking Card & Calendar Column */}
-        <div className="appointments-col-left flex flex-col gap-4">
+        {/* Left Column */}
+        <div className="calendar-col">
           <button 
             onClick={() => setIsBookModalOpen(true)}
-            className="w-full bg-black text-white rounded-[24px] p-5 flex items-center justify-between hover:bg-slate-900 transition-colors duration-150 group overflow-hidden relative cursor-pointer shadow-sm border border-black/5"
+            className="btn btn-primary book-btn"
           >
-            <div className="flex items-center gap-3 relative z-10">
-              <div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white shrink-0">
-                <Calendar size={18} />
-              </div>
-              <div className="text-left">
-                <p className="text-[10px] uppercase font-bold tracking-[0.28em] text-slate-400">Book Appointment</p>
-                <h2 className="text-[16px] font-bold tracking-tight text-white">Schedule a new visit</h2>
-              </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Calendar size={16} />
+              <span>New Appointment</span>
             </div>
-            <div className="absolute -right-4 -bottom-4 w-16 h-16 bg-[#c8f17a]/15 rounded-full blur-2xl"></div>
+            <Plus size={16} />
           </button>
-
           {renderMiniCalendar()}
         </div>
 
-        {/* Today's Schedule Column */}
-        <div className="appointments-col-right flex flex-col gap-4">
-          
-          <div className="bg-white rounded-[20px] border border-slate-100/80 shadow-xs p-5 flex flex-col gap-4">
-            
-            {/* Table Header / Filters */}
-            <div className="flex flex-wrap justify-between items-center gap-4 pb-4 border-b border-slate-100">
-              <div className="flex items-center gap-4 flex-wrap">
-                <h2 className="text-[16px] font-bold text-slate-900 font-heading">Today's Schedule</h2>
-                <div className="flex gap-1.5">
-                  <button 
-                    onClick={() => setFilterStatus('all')}
-                    className={`px-3.5 py-1 rounded-full text-xs font-bold capitalize transition-colors duration-150 cursor-pointer ${filterStatus === 'all' ? 'bg-black text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                  >
-                    All ({displayAppointments.length})
-                  </button>
-                  <button 
-                    onClick={() => setFilterStatus('pending')}
-                    className={`px-3.5 py-1 rounded-full text-xs font-bold capitalize transition-colors duration-150 cursor-pointer ${filterStatus === 'pending' ? 'bg-black text-white' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-                  >
-                    Pending
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="bg-slate-50 rounded-full px-3.5 py-1.5 flex items-center gap-2 border border-slate-100 w-44 focus-within:border-slate-300 focus-within:bg-white transition-all duration-150">
-                  <Search size={12} className="text-slate-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Search schedules..." 
-                    className="bg-transparent border-none text-[11px] font-semibold text-slate-700 placeholder-slate-400 outline-none w-full p-0"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-                <button className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors duration-150 cursor-pointer">
-                  <Filter size={13} />
-                  <span>Filter</span>
+        {/* Right Column */}
+        <div className="schedule-card">
+          <div className="schedule-header">
+            <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+              <h2 className="schedule-title">Schedule</h2>
+              <div className="schedule-filters">
+                <button 
+                  onClick={() => setFilterStatus('all')}
+                  className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
+                >
+                  All ({displayAppointments.length})
+                </button>
+                <button 
+                  onClick={() => setFilterStatus('pending')}
+                  className={`filter-btn ${filterStatus === 'pending' ? 'active' : ''}`}
+                >
+                  Pending
                 </button>
               </div>
             </div>
-
-            {/* Appointments List */}
-            {isLoading ? (
-              <div className="flex justify-center items-center py-16">
-                <Clock className="text-slate-300 animate-spin" size={20} />
+            
+            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+              <div className="search-container">
+                <Search size={14} className="text-muted" />
+                <input 
+                  type="text" 
+                  placeholder="Search schedules..." 
+                  className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
-            ) : displayAppointments.length === 0 ? (
-              <div className="py-12 text-center flex flex-col items-center justify-center">
-                <Calendar size={28} className="text-slate-200 mb-2" />
-                <h3 className="text-xs font-bold text-slate-600">No appointments scheduled</h3>
-                <p className="text-[10px] text-slate-400 mt-0.5 max-w-xs leading-normal">No entries match filters.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {displayAppointments.map((app, idx) => {
-                  const isAfterLunch = parseTime(app.timeSlot) >= 720; // 12:00 PM
-                  const isBeforeLunch = idx > 0 && parseTime(displayAppointments[idx - 1].timeSlot) < 720 && isAfterLunch;
-
-                  const timeParts = app.timeSlot ? app.timeSlot.split(' ') : ['09:00', 'AM'];
-                  const hourMin = timeParts[0];
-                  const amPm = timeParts[1] || 'AM';
-
-                  return (
-                    <React.Fragment key={app._id}>
-                      {/* Render lunch break separator */}
-                      {isBeforeLunch && (
-                        <div className="flex items-center gap-2 py-2 px-3">
-                          <div className="flex-1 h-[1px] bg-slate-100"></div>
-                          <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest font-mono">Lunch Break • 12:00 PM</span>
-                          <div className="flex-1 h-[1px] bg-slate-100"></div>
-                        </div>
-                      )}
-
-                      <div className="group flex items-center p-3 hover:bg-slate-50/50 rounded-xl transition-colors duration-150 border border-transparent hover:border-slate-100 relative gap-3">
-                        
-                        {/* Time */}
-                        <div className="w-14 shrink-0 flex flex-col items-center border-r border-slate-100 pr-3">
-                          <span className="text-[15px] font-bold text-slate-900 tracking-tight">{hourMin}</span>
-                          <span className="text-[9px] font-bold text-slate-400 uppercase mt-0.5 tracking-wider font-mono">{amPm}</span>
-                        </div>
-
-                        {/* Patient info */}
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <div className="relative shrink-0">
-                            {app.avatarUrl ? (
-                              <img 
-                                src={app.avatarUrl} 
-                                alt={app.patientId?.name} 
-                                className="w-9 h-9 rounded-full object-cover border border-slate-100 shadow-xs" 
-                              />
-                            ) : (
-                              <div className="w-9 h-9 rounded-full bg-[#f3f3f4] border border-slate-100 flex items-center justify-center text-slate-600 font-bold uppercase text-xs">
-                                {app.initials || (app.patientId?.name ? app.patientId.name.substring(0, 2) : 'PT')}
-                              </div>
-                            )}
-                            {app.status === 'in progress' && (
-                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#c8f17a] border-2 border-white rounded-full"></span>
-                            )}
-                          </div>
-
-                          <div className="flex flex-col gap-0.5 min-w-0">
-                            <h4 className="font-bold text-slate-800 text-[13px] truncate">{app.patientId?.name || 'Guest Patient'}</h4>
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[11px] text-slate-400 font-medium truncate max-w-[150px]">{app.notes || 'Routine Consultation'}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-200"></span>
-                              <span className="text-[11px] text-slate-400 font-medium truncate max-w-[120px]">{app.doctor || 'Dr. Thorne'}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Status badge & operation triggers */}
-                        <div className="flex flex-col items-end gap-1 shrink-0">
-                          <div className="flex items-center gap-2">
-                            {/* Live action operations */}
-                            {!app.isSeed && (
-                              <div className="flex gap-1.5 items-center mr-1">
-                                {app.status === 'pending' && (
-                                  <>
-                                    <button 
-                                      onClick={() => handleStatusChange(app._id, 'confirmed')}
-                                      className="px-3.5 py-1 rounded-full bg-black text-[#c8f17a] hover:bg-slate-800 text-[11px] font-bold transition-all transform hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
-                                    >
-                                      Confirm
-                                    </button>
-                                  </>
-                                )}
-                                {app.status === 'confirmed' && (
-                                  <>
-                                    <button 
-                                      onClick={() => handleStatusChange(app._id, 'completed')}
-                                      className="px-3.5 py-1 rounded-full bg-emerald-600 text-white hover:bg-emerald-700 text-[11px] font-bold transition-all transform hover:scale-105 active:scale-95 shadow-sm cursor-pointer"
-                                    >
-                                      Done
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            )}
-
-                            {app.status === 'in progress' && (
-                              <span className="px-2.5 py-0.5 bg-[#c8f17a]/15 text-[#496800] rounded-full font-mono text-[9px] font-bold uppercase tracking-wider border border-[#c8f17a]/30">
-                                <span>Active</span>
-                              </span>
-                            )}
-                            {app.status === 'pending' && (
-                              <span className="px-2.5 py-0.5 bg-slate-100 text-slate-500 rounded-full font-mono text-[9px] font-bold uppercase tracking-wider border border-slate-200">
-                                <span>Pending</span>
-                              </span>
-                            )}
-
-                            {app.status === 'completed' && (
-                              <span className="px-2.5 py-0.5 bg-[#f3f8e6] text-[#496800] rounded-full font-mono text-[9px] font-bold uppercase tracking-wider border border-[#e5f1cc]">
-                                <span>Done</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                      </div>
-                    </React.Fragment>
-                  );
-                })}
-              </div>
-            )}
-
+              <button className="btn btn-outline" style={{ padding: '0.375rem 0.5rem' }}>
+                <Filter size={14} />
+              </button>
+            </div>
           </div>
 
-        </div>
+          {isLoading ? (
+            <div className="empty-state">
+              <Clock className="text-muted animate-spin" size={24} />
+            </div>
+          ) : displayAppointments.length === 0 ? (
+            <div className="empty-state">
+              <Calendar size={28} className="text-muted" />
+              <span className="empty-state-text">No appointments found.</span>
+            </div>
+          ) : (
+            <div className="schedule-list">
+              {displayAppointments.map((app, idx) => {
+                const isAfterLunch = parseTime(app.timeSlot) >= 720; // 12:00 PM
+                const isBeforeLunch = idx > 0 && parseTime(displayAppointments[idx - 1].timeSlot) < 720 && isAfterLunch;
 
+                const timeParts = app.timeSlot ? String(app.timeSlot).split(' ') : ['09:00', 'AM'];
+                const hourMin = timeParts[0];
+                const amPm = timeParts[1] || 'AM';
+
+                let statusBadgeClass = 'badge-neutral';
+                if (app.status === 'in progress' || app.status === 'confirmed') statusBadgeClass = 'badge-success';
+                else if (app.status === 'pending') statusBadgeClass = 'badge-warning';
+
+                return (
+                  <React.Fragment key={app._id}>
+                    {isBeforeLunch && (
+                      <div className="lunch-break">
+                        <div className="lunch-line"></div>
+                        <span className="lunch-text">Lunch • 12:00 PM</span>
+                        <div className="lunch-line"></div>
+                      </div>
+                    )}
+
+                    <div className="apt-row">
+                      <div className="apt-time-col">
+                        <span className="apt-time">{hourMin}</span>
+                        <span className="apt-ampm">{amPm}</span>
+                      </div>
+
+                      <div className="apt-avatar">
+                        {app.avatarUrl ? (
+                          <img src={app.avatarUrl} alt={app.patientId?.name} />
+                        ) : (
+                          <span>{app.initials || (app.patientId?.name ? app.patientId.name.substring(0, 2).toUpperCase() : 'PT')}</span>
+                        )}
+                      </div>
+
+                      <div className="apt-details">
+                        <span className="apt-name">{app.patientId?.name || 'Guest Patient'}</span>
+                        <div className="apt-meta">
+                          <span>{app.notes || 'Routine'}</span>
+                          <span className="apt-dot"></span>
+                          <span>{app.doctor || 'Dr. Thorne'}</span>
+                        </div>
+                      </div>
+
+                      <div className="apt-actions">
+                        {!app.isSeed && app.status === 'pending' && (
+                          <button onClick={() => handleStatusChange(app._id, 'confirmed')} className="btn btn-primary" style={{ padding: '0.25rem 0.5rem', fontSize: '0.6875rem' }}>Confirm</button>
+                        )}
+                        {!app.isSeed && app.status === 'confirmed' && (
+                          <button onClick={() => handleStatusChange(app._id, 'completed')} className="btn btn-outline" style={{ padding: '0.25rem 0.5rem', fontSize: '0.6875rem' }}>Done</button>
+                        )}
+                        <span className={`badge ${statusBadgeClass}`}>{app.status}</span>
+                      </div>
+                    </div>
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
 
       <AnimatePresence>
         {isBookModalOpen && (
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="modal-overlay">
             <motion.div 
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
-              className="bg-white rounded-[24px] max-w-xl w-full p-6 shadow-xl border border-slate-100 flex flex-col gap-4"
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 8 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="modal-card"
             >
-              <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-[0.25em] text-slate-400">Book Appointment Slot</p>
-                  <h3 className="text-[15px] font-bold text-slate-900">Create a new consultation appointment</h3>
+              <div className="modal-header">
+                <div className="modal-title-group">
+                  <span className="modal-subtitle">Book Appointment Slot</span>
+                  <h3 className="modal-title">Create a new consultation</h3>
                 </div>
-                <button 
-                  onClick={() => setIsBookModalOpen(false)} 
-                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  <X size={18} />
+                <button onClick={() => setIsBookModalOpen(false)} className="icon-btn">
+                  <X size={16} />
                 </button>
               </div>
 
-              <form onSubmit={handleBookAppointment} className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Patient File</label>
+              <form onSubmit={handleBookAppointment} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                    <label className="field-label">Patient File</label>
                     {user?.role === 'patient' ? (
-                      <input 
-                        type="text"
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-500 focus:outline-none"
-                        value={user?.name || ''}
-                        disabled
-                      />
+                      <input type="text" className="input-field" value={user?.name || ''} disabled />
                     ) : (
-                      <select 
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-black transition-colors duration-150"
-                        value={selectedPatient}
-                        onChange={(e) => setSelectedPatient(e.target.value)}
-                        required
-                      >
-                        <option value="">-- Choose Patient File --</option>
-                        {patients.map(p => (
+                      <select className="input-field" value={selectedPatient} onChange={(e) => setSelectedPatient(e.target.value)} required>
+                        <option value="">-- Choose Patient --</option>
+                        {(patients || []).map(p => (
                           <option key={p._id} value={p._id}>{p.name} (Age: {p.age})</option>
                         ))}
                       </select>
                     )}
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Consultation Date</label>
-                    <input 
-                      type="date" 
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-black transition-colors duration-150"
-                      value={appointmentDate}
-                      onChange={(e) => setAppointmentDate(e.target.value)}
-                      required
-                    />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                    <label className="field-label">Date</label>
+                    <input type="date" className="input-field" value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)} required />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Time Slot</label>
-                  <select 
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none focus:border-black transition-colors duration-150"
-                    value={timeSlot}
-                    onChange={(e) => setTimeSlot(e.target.value)}
-                    required
-                  >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label className="field-label">Time Slot</label>
+                  <select className="input-field" value={timeSlot} onChange={(e) => setTimeSlot(e.target.value)} required>
                     {timeSlots.map(slot => (
                       <option key={slot} value={slot}>{slot}</option>
                     ))}
                   </select>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Symptoms / Reason</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                  <label className="field-label">Symptoms / Reason</label>
                   <textarea 
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold text-slate-800 focus:outline-none focus:border-black transition-colors duration-150 resize-none min-h-[84px]"
-                    placeholder="e.g. routine check-up, vaccine booster..."
+                    className="input-field" 
+                    style={{ resize: 'none', minHeight: '80px' }}
+                    placeholder="e.g. routine check-up..."
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                   />
                 </div>
 
-                <button 
-                  type="submit" 
-                  className="w-full bg-black text-[#c8f17a] hover:bg-slate-900 py-3 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer"
-                >
+                <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }}>
                   Confirm Scheduling
                 </button>
               </form>

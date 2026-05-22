@@ -1,115 +1,449 @@
-.diagnosis-container {
-  padding: 0;
-  width: 100%;
-}
-
-.diagnosis-grid-layout {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 1.75rem;
-  align-items: stretch;
-}
-
-.symptoms-presets-grid {
+.ai-diagnosis-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
   display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ai-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 1rem;
 }
 
-.symptom-tag-btn {
-  padding: 0.45rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-family: var(--font-sans);
-  transition: all var(--t-base) var(--ease-out);
-}
-
-.symptom-tag-btn:hover {
-  border-color: var(--neutral-400);
-  background: var(--surface-2);
+.ai-title {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--text-primary);
+  margin: 0;
+  line-height: 1.2;
 }
 
-.symptom-tag-btn.active {
-  background: var(--neutral-900);
-  color: #ffffff;
-  border-color: var(--neutral-900);
-  box-shadow: var(--shadow-sm);
+.ai-subtitle {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0 0;
 }
 
-.empty-symptoms-placeholder {
-  background: var(--surface-2);
-  border: 1px dashed var(--border);
-  border-radius: var(--radius-lg);
-}
-
-.selected-symptom-badge {
-  box-shadow: var(--shadow-xs);
-  border: 1px solid var(--brand-200);
-}
-
-.test-item-card {
-  transition: all var(--t-base) var(--ease-out);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-}
-
-.test-item-card:hover {
-  border-color: var(--neutral-400);
-  box-shadow: var(--shadow-sm);
-}
-
-/* Premium Medical Risk Level Alerts */
-.risk-low {
-  background: var(--brand-50);
-  border-color: var(--brand-200);
-  color: var(--brand-700);
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  border: 1px solid;
-}
-
-.risk-medium {
-  background: var(--warning-bg);
-  border-color: var(--warning-border);
-  color: var(--warning);
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  border: 1px solid;
-}
-
-.risk-high {
-  background: var(--danger-bg);
-  border-color: var(--danger-border);
-  color: var(--danger);
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  border: 1px solid;
-}
-
-.risk-critical {
-  background: #fff1f2;
-  border-color: #fecdd3;
-  color: #9f1239;
-  font-weight: 700;
-  border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
-  border: 1px solid;
+.ai-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 1.5rem;
+  align-items: start;
 }
 
 @media (max-width: 1024px) {
-  .diagnosis-grid-layout {
+  .ai-grid {
     grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
+}
+
+.ai-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.ai-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.ai-card-compact {
+  padding: 0.75rem 1rem;
+}
+
+.patient-context-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.patient-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.patient-name-id h4 {
+  font-family: var(--font-heading);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.patient-name-id span {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--text-muted);
+}
+
+.patient-data-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.patient-data-cell {
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  padding: 0.5rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.patient-data-label {
+  font-size: 0.5625rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.patient-data-value {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-danger {
+  color: #dc2626;
+}
+
+.ai-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ai-card-title {
+  font-size: 0.9375rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.symptom-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.symptom-toggle-btn {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+}
+
+.symptom-toggle-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.symptom-toggle-btn:hover:not(.active) {
+  background: var(--surface-3);
+}
+
+.clinical-notes-area {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.clinical-notes-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.clinical-notes-input {
+  width: 100%;
+  min-height: 96px;
+  resize: none;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: border-color var(--t-fast);
+}
+
+.clinical-notes-input:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+}
+
+.risk-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--r-md);
+  background: #fef3c7; /* Amber subtle bg */
+  color: #d97706; /* Amber text */
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.condition-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.condition-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.condition-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.condition-prob {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.condition-bar-bg {
+  height: 4px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.condition-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+}
+
+.suggested-tests {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+}
+
+.test-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.test-badge {
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-size: 0.6875rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rx-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.rx-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--surface-2);
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  transition: all var(--t-fast);
+}
+
+.rx-item:hover {
+  border-color: var(--border);
+  background: var(--surface);
+}
+
+.rx-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.rx-item-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.rx-item-dosage {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}
+
+.rx-delete-btn {
+  opacity: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: all var(--t-fast);
+}
+
+.rx-item:hover .rx-delete-btn {
+  opacity: 1;
+}
+
+.rx-delete-btn:hover {
+  color: #dc2626;
+}
+
+.rx-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.rx-input {
+  flex: 1;
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+}
+
+.rx-input:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+}
+
+.rx-add-btn {
+  padding: 0.4375rem;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t-fast);
+}
+
+.rx-add-btn:hover {
+  background: var(--surface-3);
+  color: var(--text-primary);
+}
+
+.placeholder-text {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8125rem;
+  padding: 2rem 0;
+}
+
+.skeleton-row {
+  height: 1rem;
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+
+.input-select {
+  padding: 0.4375rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  cursor: pointer;
+  outline: none;
+}
+
+.input-select:focus {
+  border-color: var(--text-secondary);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: var(--r-md);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--t-fast) var(--ease-out);
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover, #000); /* fallback */
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

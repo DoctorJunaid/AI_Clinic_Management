@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, Shield, CreditCard, Paintbrush, 
   Building, Save, Check, Plus, Trash2 
@@ -11,6 +11,7 @@ import './Settings.css';
 const Settings = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('profile');
   
   // Settings state
   const [name, setName] = useState('');
@@ -46,11 +47,9 @@ const Settings = () => {
       setName(user.name);
       setPhone(user.phone || '');
       setSpecialization(user.specialization || '');
-      // Cache local preference for demo or load from user
       const storedPlan = localStorage.getItem('demo_saas_plan');
       setSubscriptionPlan(storedPlan || user.subscriptionPlan || 'pro');
 
-      // If user is admin, also fetch active staff list
       if (user.role === 'admin') {
         fetchStaff();
       }
@@ -93,7 +92,6 @@ const Settings = () => {
       return;
     }
 
-    // SaaS starter limits check!
     if (subscriptionPlan === 'free' && staffList.length >= 1) {
       toast.error('Starter Plan Limit Reached! Upgrade your SaaS Plan to Pro to register multiple staff accounts.');
       return;
@@ -149,372 +147,316 @@ const Settings = () => {
     toast.success('Clinic configurations saved successfully!');
   };
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="settings-container"
-    >
-      <div className="settings-header-section">
-        <div>
-          <h1>Saylani Clinic Control Center</h1>
-          <p>Configure staff credentials, update contact records, and modify active subscriptions.</p>
-        </div>
-      </div>
-
-      <div className="settings-grid-layout">
-        {/* LEFT COLUMN: Profile & Clinic Settings */}
-        <div className="form-stack">
-          {/* User Profile Form */}
-          <div className="glass-card">
-            <div className="glass-card-header">
-              <div className="glass-card-header-left">
-                <User size={16} />
-                <h3>My Staff Profile Settings</h3>
-              </div>
+  const renderSection = () => {
+    switch(activeSection) {
+      case 'profile':
+        return (
+          <motion.div 
+            key="profile"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="settings-section-card"
+          >
+            <div className="section-header">
+              <h3 className="section-title">Profile Settings</h3>
             </div>
-            
             {isLoading ? (
-              <div className="skeleton w-full h-24"></div>
+              <p>Loading profile...</p>
             ) : (
               <form onSubmit={handleUpdateProfile} className="form-stack">
                 <div className="field-group">
                   <label className="field-label">Full Name</label>
-                  <input 
-                    type="text" 
-                    className="premium-input"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
+                  <input type="text" className="input-field" value={name} onChange={(e) => setName(e.target.value)} required />
                 </div>
-
                 <div className="form-row">
                   <div className="field-group">
                     <label className="field-label">Contact Number</label>
-                    <input 
-                      type="text" 
-                      className="premium-input"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
+                    <input type="text" className="input-field" value={phone} onChange={(e) => setPhone(e.target.value)} />
                   </div>
                   <div className="field-group">
                     <label className="field-label">Specialization / Role</label>
-                    <input 
-                      type="text" 
-                      className="premium-input"
-                      value={specialization}
-                      onChange={(e) => setSpecialization(e.target.value)}
-                      placeholder="e.g. Pediatrics"
-                      disabled={currentUser?.role !== 'doctor' && currentUser?.role !== 'admin'}
-                    />
+                    <input type="text" className="input-field" value={specialization} onChange={(e) => setSpecialization(e.target.value)} placeholder="e.g. Pediatrics" disabled={currentUser?.role !== 'doctor' && currentUser?.role !== 'admin'} />
                   </div>
                 </div>
-
                 <div className="field-group">
                   <label className="field-label">Email Address</label>
-                  <input 
-                    type="email" 
-                    className="premium-input"
-                    value={currentUser?.email || ''}
-                    disabled
-                  />
+                  <input type="email" className="input-field" value={currentUser?.email || ''} disabled />
                 </div>
-
-                <button type="submit" className="premium-btn">
-                  <Save size={14} /> Update Profile
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" className="btn btn-primary">
+                    <Save size={14} /> Save Changes
+                  </button>
+                </div>
               </form>
             )}
-          </div>
+          </motion.div>
+        );
 
-          {/* Clinic Configurations (Only visible to Admin) */}
-          {currentUser?.role === 'admin' && (
-            <div className="glass-card">
-              <div className="glass-card-header">
-                <div className="glass-card-header-left">
-                  <Building size={16} />
-                  <h3>Clinic Information Settings</h3>
-                </div>
-              </div>
-
-              <form onSubmit={handleSaveClinicSettings} className="form-stack">
-                <div className="field-group">
-                  <label className="field-label">Clinic Name</label>
-                  <input 
-                    type="text" 
-                    className="premium-input"
-                    value={clinicName}
-                    onChange={(e) => setClinicName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label">Clinic Address</label>
-                  <input 
-                    type="text" 
-                    className="premium-input"
-                    value={clinicAddress}
-                    onChange={(e) => setClinicAddress(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="field-group">
-                  <label className="field-label">Primary Phone</label>
-                  <input 
-                    type="text" 
-                    className="premium-input"
-                    value={clinicPhone}
-                    onChange={(e) => setClinicPhone(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <button type="submit" className="premium-btn">
-                  <Save size={14} /> Save Clinic Settings
-                </button>
-              </form>
+      case 'clinic':
+        if (currentUser?.role !== 'admin') return null;
+        return (
+          <motion.div 
+            key="clinic"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="settings-section-card"
+          >
+            <div className="section-header">
+              <h3 className="section-title">Clinic Information</h3>
             </div>
-          )}
-        </div>
+            <form onSubmit={handleSaveClinicSettings} className="form-stack">
+              <div className="field-group">
+                <label className="field-label">Clinic Name</label>
+                <input type="text" className="input-field" value={clinicName} onChange={(e) => setClinicName(e.target.value)} required />
+              </div>
+              <div className="field-group">
+                <label className="field-label">Clinic Address</label>
+                <input type="text" className="input-field" value={clinicAddress} onChange={(e) => setClinicAddress(e.target.value)} required />
+              </div>
+              <div className="field-group">
+                <label className="field-label">Primary Phone</label>
+                <input type="text" className="input-field" value={clinicPhone} onChange={(e) => setClinicPhone(e.target.value)} required />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button type="submit" className="btn btn-primary">
+                  <Save size={14} /> Save Settings
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        );
 
-        {/* RIGHT COLUMN: Admin User Management Panel & SaaS Options */}
-        <div className="form-stack">
-          {/* Staff Accounts Management (Only visible to Admin) */}
-          {currentUser?.role === 'admin' && (
-            <div className="glass-card">
-              <div className="glass-card-header">
-                <div className="glass-card-header-left">
-                  <Shield size={16} />
-                  <h3>Clinic Staff & Accounts Console</h3>
+      case 'staff':
+        if (currentUser?.role !== 'admin') return null;
+        return (
+          <motion.div 
+            key="staff"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="settings-section-card"
+          >
+            <div className="section-header">
+              <h3 className="section-title">Staff & Accounts</h3>
+              <span className="badge badge-info">{staffList.length} Accounts</span>
+            </div>
+            
+            <form onSubmit={handleCreateStaff} className="staff-register-box">
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h4 style={{ margin: 0, fontSize: '0.8125rem', fontWeight: 600 }}>Register Staff Member</h4>
+                {subscriptionPlan === 'free' && (
+                  <span className="badge badge-warning">Slots: {staffList.length}/1</span>
+                )}
+              </div>
+              
+              <div className="form-row">
+                <div className="field-group">
+                  <label className="field-label">Full Name</label>
+                  <input type="text" className="input-field" placeholder="Dr. Yasir" value={staffName} onChange={(e) => setStaffName(e.target.value)} required />
                 </div>
-                <span className="glass-card-badge">Admin</span>
+                <div className="field-group">
+                  <label className="field-label">Email Address</label>
+                  <input type="email" className="input-field" placeholder="staff@saylani.com" value={staffEmail} onChange={(e) => setStaffEmail(e.target.value)} required />
+                </div>
               </div>
 
-              {/* Form to Register Staff Account */}
-              <form onSubmit={handleCreateStaff} className="form-stack" style={{ background: '#f8faf9', padding: '1.25rem', borderRadius: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', width: '100%' }}>
-                  <span className="field-label" style={{ color: '#64748b', flex: '1' }}>Register New Staff Member</span>
-                  {subscriptionPlan === 'free' && (
-                    <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#f59e0b', background: '#fffbeb', padding: '0.15rem 0.4rem', borderRadius: '4px' }}>
-                      Starter Slots: {staffList.length}/1 Max
-                    </span>
-                  )}
+              <div className="form-row">
+                <div className="field-group">
+                  <label className="field-label">Password</label>
+                  <input type="password" className="input-field" placeholder="Min 6 chars" value={staffPassword} onChange={(e) => setStaffPassword(e.target.value)} required />
                 </div>
-                
-                <div className="form-row">
-                  <div className="field-group">
-                    <label className="field-label">Full Name</label>
-                    <input 
-                      type="text" 
-                      className="premium-input"
-                      placeholder="e.g. Dr. Yasir"
-                      value={staffName}
-                      onChange={(e) => setStaffName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="field-group">
-                    <label className="field-label">Email Address</label>
-                    <input 
-                      type="email" 
-                      className="premium-input"
-                      placeholder="staff@saylani.com"
-                      value={staffEmail}
-                      onChange={(e) => setStaffEmail(e.target.value)}
-                      required
-                    />
-                  </div>
+                <div className="field-group">
+                  <label className="field-label">System Role</label>
+                  <select className="input-field" value={staffRole} onChange={(e) => setStaffRole(e.target.value)}>
+                    <option value="doctor">Doctor</option>
+                    <option value="receptionist">Receptionist</option>
+                  </select>
                 </div>
+              </div>
 
-                <div className="form-row">
-                  <div className="field-group">
-                    <label className="field-label">Password</label>
-                    <input 
-                      type="password" 
-                      className="premium-input"
-                      placeholder="Min 6 chars"
-                      value={staffPassword}
-                      onChange={(e) => setStaffPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="field-group">
-                    <label className="field-label">System Role</label>
-                    <select 
-                      className="premium-input"
-                      value={staffRole}
-                      onChange={(e) => setStaffRole(e.target.value)}
-                    >
-                      <option value="doctor">Doctor</option>
-                      <option value="receptionist">Receptionist</option>
-                    </select>
-                  </div>
+              <div className="form-row">
+                <div className="field-group">
+                  <label className="field-label">Phone Number</label>
+                  <input type="text" className="input-field" placeholder="0300-1234567" value={staffPhone} onChange={(e) => setStaffPhone(e.target.value)} />
                 </div>
-
-                <div className="form-row">
+                {staffRole === 'doctor' && (
                   <div className="field-group">
-                    <label className="field-label">Phone Number</label>
-                    <input 
-                      type="text" 
-                      className="premium-input"
-                      placeholder="e.g. 0300-1234567"
-                      value={staffPhone}
-                      onChange={(e) => setStaffPhone(e.target.value)}
-                    />
+                    <label className="field-label">Specialization</label>
+                    <input type="text" className="input-field" placeholder="e.g. Pediatrics" value={staffSpec} onChange={(e) => setStaffSpec(e.target.value)} />
                   </div>
-                  {staffRole === 'doctor' && (
-                    <div className="field-group">
-                      <label className="field-label">Specialization</label>
-                      <input 
-                        type="text" 
-                        className="premium-input"
-                        placeholder="e.g. Pediatrics"
-                        value={staffSpec}
-                        onChange={(e) => setStaffSpec(e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
+                )}
+              </div>
+              
+              <button type="submit" disabled={isCreatingStaff} className="btn btn-primary" style={{ width: '100%' }}>
+                <Plus size={14} /> {isCreatingStaff ? 'Registering...' : 'Register Staff Account'}
+              </button>
+            </form>
 
-                <button type="submit" disabled={isCreatingStaff} className="premium-btn" style={{ alignSelf: 'stretch', width: '100%', marginTop: '0.25rem' }}>
-                  <Plus size={14} />
-                  <span>{isCreatingStaff ? 'Registering Staff...' : 'Register Staff Account'}</span>
-                </button>
-              </form>
-
-              {/* Staff Registry List */}
-              <div className="registry-stack">
-                <span className="field-label">Active Staff Registry</span>
-                <div className="registry-scroll-area">
-                  {staffList.length === 0 ? (
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontStyle: 'italic' }}>No registered staff records loaded.</span>
-                  ) : (
-                    staffList.map(staff => (
-                      <div key={staff._id} className="registry-item">
-                        <div className="registry-item-details">
-                          <strong>{staff.name}</strong>
-                          <span>
-                            Role: {staff.role} {staff.specialization ? `(${staff.specialization})` : ''}
-                          </span>
-                        </div>
-                        <button onClick={() => handleDeleteStaff(staff._id)} className="registry-delete-btn">
-                          <Trash2 size={13} />
-                        </button>
+            <div className="staff-list">
+              <span className="field-label">Active Directory</span>
+              {staffList.length === 0 ? (
+                <p style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>No staff records found.</p>
+              ) : (
+                staffList.map(staff => (
+                  <div key={staff._id} className="staff-row">
+                    <div className="staff-info">
+                      <div className="staff-avatar">{staff.name.substring(0,2).toUpperCase()}</div>
+                      <div className="staff-details">
+                        <span className="staff-name">{staff.name}</span>
+                        <span className="staff-role">{staff.role} {staff.specialization ? `(${staff.specialization})` : ''}</span>
                       </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Account Details & Role Details (Visible ONLY to Non-Admins: Doctors & Receptionists) */}
-          {currentUser?.role !== 'admin' && (
-            <div className="glass-card" style={{ background: 'rgba(255, 255, 255, 0.5)' }}>
-              <div className="glass-card-header">
-                <div className="glass-card-header-left">
-                  <Shield size={16} />
-                  <h3>Account Access & Permissions</h3>
-                </div>
-                <span className="glass-card-badge" style={{ background: '#e2e8f0', color: '#475569' }}>
-                  {currentUser?.role}
-                </span>
-              </div>
-              <div className="form-stack">
-                <p style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: '1.4' }}>
-                  Your account is registered as an active staff member of the clinical workstation. General settings, system visual preferences, and subscription tier settings are managed centrally by the administrative director.
-                </p>
-                <div style={{ background: '#f8faf9', padding: '1rem', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '0.65rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase' }}>Administrator Contact</span>
-                  <strong style={{ fontSize: '0.8rem', color: '#1e293b' }}>Dr. Junaid Aurangzeb (Clinical Admin)</strong>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>admin@saylani.com</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* SaaS subscription Plan selection (Only visible to Admin) */}
-          {currentUser?.role === 'admin' && (
-            <div className="glass-card">
-              <div className="glass-card-header">
-                <div className="glass-card-header-left">
-                  <CreditCard size={16} />
-                  <h3>SaaS Billing & Plan Selection</h3>
-                </div>
-                <span className="glass-card-badge" style={{ background: '#c8f17a' }}>
-                  Active: {subscriptionPlan.toUpperCase()}
-                </span>
-              </div>
-
-              <div className="subscription-plans-grid">
-                <div 
-                  className={`sub-plan-row ${subscriptionPlan === 'free' ? 'active' : ''}`}
-                  onClick={() => handleUpdateSubscription('free')}
-                >
-                  <div className="sub-plan-details">
-                    <strong>Starter Basic Plan (Free)</strong>
-                    <span>Up to 1 doctor slot · 5 AI checks/month · Manual intake logs</span>
+                    </div>
+                    <button onClick={() => handleDeleteStaff(staff._id)} className="delete-btn">
+                      <Trash2 size={16} />
+                    </button>
                   </div>
-                  {subscriptionPlan === 'free' && <Check size={16} style={{ color: '#10b981' }} />}
-                </div>
+                ))
+              )}
+            </div>
+          </motion.div>
+        );
 
-                <div 
-                  className={`sub-plan-row ${subscriptionPlan === 'pro' ? 'active' : ''}`}
-                  onClick={() => handleUpdateSubscription('pro')}
-                >
-                  <div className="sub-plan-details">
-                    <strong>
-                      Pro Clinical AI Plan (PKR 12,500/mo)
-                    </strong>
-                    <span>Unlimited staff slots · Infinite Qwen symptom checks · Laboratory recommendations</span>
-                  </div>
-                  {subscriptionPlan === 'pro' && <Check size={16} style={{ color: '#10b981' }} />}
+      case 'billing':
+        if (currentUser?.role !== 'admin') return null;
+        return (
+          <motion.div 
+            key="billing"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="settings-section-card"
+          >
+            <div className="section-header">
+              <h3 className="section-title">Plan & Billing</h3>
+              <span className="badge" style={{ background: 'var(--primary)', color: '#fff' }}>Active: {subscriptionPlan.toUpperCase()}</span>
+            </div>
+
+            <div className="form-stack">
+              <div 
+                className={`plan-row ${subscriptionPlan === 'free' ? 'active' : ''}`}
+                onClick={() => handleUpdateSubscription('free')}
+              >
+                <div className="plan-details">
+                  <span className="plan-name">Starter Basic Plan (Free)</span>
+                  <span className="plan-features">1 doctor slot · 5 AI checks/mo · Manual logs</span>
                 </div>
+                {subscriptionPlan === 'free' && <Check size={18} style={{ color: 'var(--primary)' }} />}
               </div>
 
-              <div className="plan-perks-box">
-                <h4 style={{ fontSize: '0.75rem', fontWeight: '700', color: '#1e293b', marginBottom: '0.35rem' }}>
-                  {subscriptionPlan === 'pro' ? '✓ Pro Subscription active clinic-wide' : '⚠️ Starter Limitations active'}
-                </h4>
-                <p style={{ fontSize: '0.75rem', color: '#64748b', lineHeight: '1.4', margin: '0' }}>
-                  {subscriptionPlan === 'pro' 
-                    ? 'Your clinical portal is operating on the Pro AI subscription tier. Unlimited diagnostic panels, instant symptom correlations, and infinite doctors slots are enabled.'
-                    : 'Your clinic is operating under Starter limitations. Registering more than one staff slot or running additional AI symptom correlations requires transitioning to the Pro tier.'}
-                </p>
+              <div 
+                className={`plan-row ${subscriptionPlan === 'pro' ? 'active' : ''}`}
+                onClick={() => handleUpdateSubscription('pro')}
+              >
+                <div className="plan-details">
+                  <span className="plan-name">Pro Clinical AI Plan ($150/mo)</span>
+                  <span className="plan-features">Unlimited slots · Infinite AI checks · Advanced labs</span>
+                </div>
+                {subscriptionPlan === 'pro' && <Check size={18} style={{ color: 'var(--primary)' }} />}
+              </div>
+
+              <div className="plan-desc-block">
+                <strong>{subscriptionPlan === 'pro' ? '✓ Pro Subscription Active' : '⚠️ Starter Limitations Active'}</strong>
+                <br/>
+                {subscriptionPlan === 'pro' 
+                  ? 'Your clinical portal is operating on the Pro tier. Unlimited diagnostic panels, instant symptom correlations, and infinite doctor slots are enabled.'
+                  : 'Your clinic is operating under Starter limitations. Registering more than one staff slot or running additional AI checks requires transitioning to Pro.'}
               </div>
             </div>
-          )}
+          </motion.div>
+        );
 
-          {/* Visual Themes selection (Only visible to Admin) */}
-          {currentUser?.role === 'admin' && (
-            <div className="glass-card">
-              <div className="glass-card-header">
-                <div className="glass-card-header-left">
-                  <Paintbrush size={16} />
-                  <h3>Visual Settings</h3>
-                </div>
-              </div>
-
-              <div className="themes-preset-row">
+      case 'appearance':
+        if (currentUser?.role !== 'admin') return null;
+        return (
+          <motion.div 
+            key="appearance"
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="settings-section-card"
+          >
+            <div className="section-header">
+              <h3 className="section-title">Visual Preferences</h3>
+            </div>
+            <div className="form-stack">
+              <span className="field-label">Interface Theme</span>
+              <div className="theme-btn-group">
                 {['light', 'dark', 'system'].map((mode) => (
                   <button
                     key={mode}
                     className={`theme-btn ${themeMode === mode ? 'active' : ''}`}
                     onClick={() => {
                       setThemeMode(mode);
-                      toast.success(`${mode.toUpperCase()} preset loaded!`);
+                      toast.success(`${mode.charAt(0).toUpperCase() + mode.slice(1)} preset loaded!`);
                     }}
                   >
-                    {mode}
+                    {mode.charAt(0).toUpperCase() + mode.slice(1)}
                   </button>
                 ))}
               </div>
             </div>
+          </motion.div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 5 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className="settings-page"
+    >
+      <div className="settings-header">
+        <h1 className="settings-title">Control Center</h1>
+        <p className="settings-subtitle">Manage preferences, team accounts, and billing details.</p>
+      </div>
+
+      <div className="settings-layout">
+        <div className="settings-nav">
+          <span className="nav-group-label">Personal</span>
+          <button 
+            className={`settings-nav-item ${activeSection === 'profile' ? 'active' : ''}`}
+            onClick={() => setActiveSection('profile')}
+          >
+            <User size={16} /> Profile
+          </button>
+          
+          {currentUser?.role === 'admin' && (
+            <>
+              <span className="nav-group-label" style={{ marginTop: '1rem' }}>Workspace</span>
+              <button 
+                className={`settings-nav-item ${activeSection === 'clinic' ? 'active' : ''}`}
+                onClick={() => setActiveSection('clinic')}
+              >
+                <Building size={16} /> Clinic Info
+              </button>
+              <button 
+                className={`settings-nav-item ${activeSection === 'staff' ? 'active' : ''}`}
+                onClick={() => setActiveSection('staff')}
+              >
+                <Shield size={16} /> Staff & Roles
+              </button>
+              <button 
+                className={`settings-nav-item ${activeSection === 'billing' ? 'active' : ''}`}
+                onClick={() => setActiveSection('billing')}
+              >
+                <CreditCard size={16} /> Plan & Billing
+              </button>
+              <button 
+                className={`settings-nav-item ${activeSection === 'appearance' ? 'active' : ''}`}
+                onClick={() => setActiveSection('appearance')}
+              >
+                <Paintbrush size={16} /> Appearance
+              </button>
+            </>
           )}
+        </div>
+
+        <div className="settings-content">
+          <AnimatePresence mode="wait">
+            {renderSection()}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>

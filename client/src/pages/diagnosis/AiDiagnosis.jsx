@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Brain, CheckCircle, ShieldAlert, Trash2, Plus, Heart, Lock
 } from 'lucide-react';
@@ -24,7 +24,7 @@ const AiDiagnosis = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState(null);
   
-  // Prescription state - initializing empty so the doctor builds it dynamically
+  // Prescription state
   const [prescriptionList, setPrescriptionList] = useState([]);
   const [newPrescName, setNewPrescName] = useState('');
   const [newPrescDosage, setNewPrescDosage] = useState('');
@@ -39,7 +39,6 @@ const AiDiagnosis = () => {
     return val ? parseInt(val, 10) : 0;
   });
 
-  // Clickable preset symptom list to instantly toggle symptoms
   const presetSymptoms = [
     'Fever', 'Cough', 'Body Aches', 'Chills', 
     'Dizziness', 'Shortness of breath', 'Headache', 'Watery Diarrhea', 'Nausea'
@@ -54,13 +53,11 @@ const AiDiagnosis = () => {
       const res = await axios.get('/api/v1/patients');
       setPatients(res.data.data);
       if (res.data.data.length > 0) {
-        // Auto select first patient to populate workspace
         const first = res.data.data[0];
         setSelectedPatient(first._id);
         setPatientDetails(first);
         setChiefComplaint(first.medicalHistory || 'Presenting for routine checkup and symptom assessment.');
         
-        // Auto-extract matching preset symptoms from history
         const historyText = (first.medicalHistory || '').toLowerCase();
         const detected = [];
         if (historyText.includes('fever')) detected.push('Fever');
@@ -87,7 +84,6 @@ const AiDiagnosis = () => {
     setPatientDetails(found);
     setChiefComplaint(found.medicalHistory || 'No active medical history recorded. Presenting for symptom evaluation.');
     
-    // Auto-extract matching preset symptoms from medical history
     const historyText = (found.medicalHistory || '').toLowerCase();
     const detected = [];
     if (historyText.includes('fever')) detected.push('Fever');
@@ -97,7 +93,7 @@ const AiDiagnosis = () => {
     setSymptoms(detected);
     
     setDiagnosisResult(null);
-    setPrescriptionList([]); // Clear prescription list when patient changes
+    setPrescriptionList([]); 
   };
 
   const toggleSymptom = (symptom) => {
@@ -135,7 +131,6 @@ const AiDiagnosis = () => {
       setDiagnosisResult(res.data.data);
       toast.success('Clinical Diagnostic Assessment Complete!');
 
-      // Increment daily usage for Free plan
       if (user?.subscriptionPlan !== 'pro') {
         const nextUsage = dailyUsage + 1;
         setDailyUsage(nextUsage);
@@ -154,7 +149,6 @@ const AiDiagnosis = () => {
         suggestedTests: ['Spirometry (Pulmonary Function Test)', 'Complete Blood Count (CBC Panel)']
       });
 
-      // Increment daily usage for Free plan even on fallback
       if (user?.subscriptionPlan !== 'pro') {
         const nextUsage = dailyUsage + 1;
         setDailyUsage(nextUsage);
@@ -204,7 +198,7 @@ const AiDiagnosis = () => {
 
       await axios.post('/api/v1/prescriptions', payload);
       toast.success('Digital Prescription successfully saved to MongoDB!');
-      setPrescriptionList([]); // Clear prescription list on successful save
+      setPrescriptionList([]); 
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to save digital prescription.');
     } finally {
@@ -214,100 +208,91 @@ const AiDiagnosis = () => {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 5 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 md:p-8 max-w-[1400px] mx-auto min-h-screen flex flex-col gap-6"
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className="ai-diagnosis-page"
     >
       {/* Header bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
+      <div className="ai-header-row">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 font-headline-xl">AI Symptom Desk</h1>
-          <p className="text-sm text-slate-500 mt-1">Select a patient, toggle active symptoms, and analyze diagnostics with one click.</p>
+          <h1 className="ai-title">Clinical AI Diagnostics</h1>
+          <p className="ai-subtitle">Select patient · toggle symptoms · run differential analysis</p>
         </div>
-        <div className="flex items-center gap-3">
-          <select 
-            className="bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl px-4 py-2.5 shadow-sm outline-none"
-            value={selectedPatient}
-            onChange={(e) => handlePatientChange(e.target.value)}
-          >
-            <option value="">-- Guest Mode --</option>
-            {patients.map(p => (
-              <option key={p._id} value={p._id}>{p.name} (Age: {p.age}, {p.gender})</option>
-            ))}
-          </select>
-        </div>
+        <select 
+          className="input-select"
+          value={selectedPatient}
+          onChange={(e) => handlePatientChange(e.target.value)}
+        >
+          <option value="">-- Guest Mode --</option>
+          {patients.map(p => (
+            <option key={p._id} value={p._id}>{p.name} (Age: {p.age}, {p.gender})</option>
+          ))}
+        </select>
       </div>
 
       {/* 2-Column Clean Workspace */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="ai-grid">
         
-        {/* LEFT COLUMN: Clinical Intake, Patient Card & Active Symptom Checklist */}
-        <div className="lg:col-span-6 flex flex-col gap-6">
+        {/* LEFT COLUMN */}
+        <div className="ai-col">
           
           {/* Patient Quick Info Card */}
           {patientDetails && (
-            <div className="card rounded-2xl p-5 flex flex-col gap-4 shadow-sm" style={{ border: 'none' }}>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-slate-100 overflow-hidden flex items-center justify-center shrink-0 text-slate-500 font-bold text-base uppercase">
-                  {patientDetails.name.substring(0, 2)}
+            <div className="ai-card ai-card-compact">
+              <div className="patient-context-header">
+                <div className="patient-avatar-circle">
+                  {patientDetails.name.substring(0, 2).toUpperCase()}
                 </div>
-                <div>
-                  <h4 className="font-bold text-slate-900 text-base">{patientDetails.name}</h4>
-                  <p className="text-xs font-semibold text-slate-400">Patient ID: #{patientDetails._id.substring(0, 5)}</p>
+                <div className="patient-name-id">
+                  <h4>{patientDetails.name}</h4>
+                  <span>#{patientDetails._id.substring(0, 8)}</span>
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-slate-50 p-3 rounded-xl flex flex-col">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Age / Sex</span>
-                  <strong className="text-xs text-slate-800 mt-1 font-semibold">{patientDetails.age}y / {patientDetails.gender}</strong>
+              <div className="patient-data-row">
+                <div className="patient-data-cell">
+                  <span className="patient-data-label">Age / Sex</span>
+                  <span className="patient-data-value">{patientDetails.age}y / {patientDetails.gender}</span>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-xl flex flex-col">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Medical History</span>
-                  <strong className="text-xs text-slate-800 mt-1 font-semibold truncate">{patientDetails.medicalHistory || 'None'}</strong>
+                <div className="patient-data-cell">
+                  <span className="patient-data-label">Medical History</span>
+                  <span className="patient-data-value" title={patientDetails.medicalHistory || 'None'}>
+                    {patientDetails.medicalHistory || 'None'}
+                  </span>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-xl flex flex-col">
-                  <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Allergies</span>
-                  <strong className="text-xs text-red-600 mt-1 font-bold truncate">Penicillin, Pollen</strong>
+                <div className="patient-data-cell">
+                  <span className="patient-data-label">Allergies</span>
+                  <span className="patient-data-value text-danger">Penicillin, Pollen</span>
                 </div>
               </div>
             </div>
           )}
 
           {/* Symptom Selection & Clinical Notes Card */}
-          <div className="card rounded-2xl p-6 flex flex-col gap-5 shadow-sm" style={{ border: 'none' }}>
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
-              <span>Symptom Selection & Intake</span>
-              <span className="text-[10px] font-bold bg-[#c8f17a] text-black px-2.5 py-0.5 rounded">Select & Toggle</span>
-            </h3>
+          <div className="ai-card">
+            <div className="ai-card-header">
+              <h3 className="ai-card-title">Symptom Intake</h3>
+            </div>
 
-            {/* Clickable Quick Toggle Tags */}
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Click symptoms to correlate</label>
-              <div className="flex flex-wrap gap-2">
-                {presetSymptoms.map(sym => {
-                  const isActive = symptoms.includes(sym);
-                  return (
-                    <button
-                      key={sym}
-                      onClick={() => toggleSymptom(sym)}
-                      className={`text-xs font-bold px-3 py-2 rounded-xl transition-all ${
-                        isActive 
-                          ? 'bg-black text-white hover:bg-slate-800' 
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                      }`}
-                    >
-                      {sym}
-                    </button>
-                  );
-                })}
+            <div className="clinical-notes-area">
+              <span className="clinical-notes-label">Active Symptoms</span>
+              <div className="symptom-toggles">
+                {presetSymptoms.map(sym => (
+                  <button
+                    key={sym}
+                    onClick={() => toggleSymptom(sym)}
+                    className={`symptom-toggle-btn ${symptoms.includes(sym) ? 'active' : ''}`}
+                  >
+                    {sym}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Observations / Chief Complaint */}
-            <div className="flex flex-col gap-1.5 mt-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Clinical Description & Notes</label>
+            <div className="clinical-notes-area" style={{ marginTop: '0.5rem' }}>
+              <span className="clinical-notes-label">Clinical Notes</span>
               <textarea 
-                className="w-full bg-slate-50 rounded-xl px-4 py-3.5 text-xs font-semibold text-slate-800 focus:outline-none resize-none min-h-[100px]"
+                className="clinical-notes-input"
                 placeholder="Describe patient observations, symptoms, or physical examination details..."
                 value={chiefComplaint}
                 onChange={(e) => setChiefComplaint(e.target.value)}
@@ -316,128 +301,65 @@ const AiDiagnosis = () => {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: AI Diagnostics Output & Prescriptions */}
-        <div className="lg:col-span-6 flex flex-col gap-6">
+        {/* RIGHT COLUMN */}
+        <div className="ai-col">
           
           {/* Main AI Diagnostics Card */}
-          <div className="card rounded-2xl p-6 flex flex-col gap-5 shadow-sm" style={{ border: 'none' }}>
-            {user?.subscriptionPlan !== 'pro' && dailyUsage >= 3 ? (
-              <div style={{
-                position: 'relative',
-                borderRadius: '16px',
-                padding: '2.5rem 1.5rem',
-                background: 'linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.95) 100%)',
-                border: '1px solid rgba(226, 232, 240, 0.8)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                gap: '1rem',
-                minHeight: '300px',
-                boxShadow: 'inset 0 0 20px rgba(0,0,0,0.01)'
-              }}>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
-                  borderRadius: '50%',
-                  background: '#ffffff',
-                  border: '1px solid #e2e8f0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 8px 16px -4px rgba(0,0,0,0.05)',
-                  color: '#64748b'
-                }}>
-                  <Lock size={20} />
-                </div>
-                <div>
-                  <h4 style={{ fontSize: '0.95rem', fontWeight: '800', color: '#0f172a', marginBottom: '0.35rem' }}>
-                    Daily Free Limit Reached
-                  </h4>
-                  <p style={{ fontSize: '0.75rem', fontWeight: '500', color: '#64748b', maxWidth: '320px', margin: '0 auto', lineHeight: '1.5' }}>
-                    You have reached your limit of 3 free AI diagnostics for today. Upgrade to the Pro Plan for unlimited diagnostic queries.
-                  </p>
-                </div>
+          <div className="ai-card">
+            <div className="ai-card-header">
+              <h3 className="ai-card-title">
+                <Brain size={15} /> Differential Analysis
+              </h3>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                {user?.subscriptionPlan !== 'pro' && (
+                  <span className="test-badge" style={{ background: 'transparent' }}>
+                    {dailyUsage}/3 limit
+                  </span>
+                )}
                 <button 
-                  onClick={() => setIsPricingOpen(true)}
-                  style={{
-                    background: '#000000',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: '10px',
-                    padding: '0.65rem 1.5rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    transition: 'all 0.2s ease',
-                    marginTop: '0.5rem'
-                  }}
-                  onMouseOver={(e) => e.target.style.transform = 'translateY(-1px)'}
-                  onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                  onClick={runSymptomAssessment} 
+                  className="btn btn-primary"
+                  disabled={isAiLoading}
                 >
-                  Upgrade to Pro Plan
+                  {isAiLoading ? 'Analyzing...' : 'Run Analysis'}
                 </button>
               </div>
-            ) : (
-              <>
-                <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5 flex-wrap">
-                    <Brain size={16} className="text-black" />
-                    <span>AI Clinical Diagnosis Desk</span>
-                    {user?.subscriptionPlan !== 'pro' && (
-                      <span style={{
-                        fontSize: '0.65rem',
-                        fontWeight: '700',
-                        color: '#64748b',
-                        background: '#f1f5f9',
-                        padding: '0.15rem 0.5rem',
-                        borderRadius: '6px',
-                        marginLeft: '0.5rem'
-                      }}>
-                        Today: {dailyUsage} / 3 free queries used
-                      </span>
-                    )}
-                  </h3>
-                  <button 
-                    onClick={runSymptomAssessment} 
-                    className="bg-black hover:bg-slate-800 text-white font-bold text-xs px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-sm"
-                    disabled={isAiLoading}
-                  >
-                    <Brain size={14} className={isAiLoading ? 'animate-spin' : ''} />
-                    <span>{isAiLoading ? 'Analyzing...' : 'Diagnose Symptoms'}</span>
-                  </button>
-                </div>
+            </div>
 
+            <div style={{ minHeight: '180px' }}>
+              <AnimatePresence mode="wait">
                 {isAiLoading ? (
-                  <div className="flex flex-col items-center justify-center py-16 gap-3">
-                    <Brain className="text-slate-400 animate-spin" size={32} />
-                    <p className="text-xs font-semibold text-slate-500">Intelligent clinical differential lookup in progress...</p>
-                  </div>
+                  <motion.div 
+                    key="loading"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', paddingTop: '1rem' }}
+                  >
+                    <div className="skeleton-row" style={{ width: '100%' }}></div>
+                    <div className="skeleton-row" style={{ width: '85%' }}></div>
+                    <div className="skeleton-row" style={{ width: '90%' }}></div>
+                  </motion.div>
                 ) : diagnosisResult ? (
-                  <div className="flex flex-col gap-5">
-                    {/* Risk Level */}
-                    <div className="bg-amber-50 rounded-xl p-3 flex gap-3 items-center">
-                      <ShieldAlert className="text-amber-600 shrink-0" size={18} />
-                      <div>
-                        <h4 className="text-xs font-bold text-slate-800">{diagnosisResult.riskLevel}</h4>
-                        <p className="text-[10px] text-slate-500 font-semibold">Verify clinical history to exclude high-risk symptoms.</p>
-                      </div>
+                  <motion.div 
+                    key="result"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '0.5rem' }}
+                  >
+                    <div className="risk-banner">
+                      <ShieldAlert size={14} />
+                      <span>{diagnosisResult.riskLevel} - Verify clinical history to exclude high-risk symptoms.</span>
                     </div>
 
-                    {/* Conditions list with progress bars */}
-                    <div className="flex flex-col gap-3">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Differential Diagnoses Found</span>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <span className="clinical-notes-label">Conditions Found</span>
                       {diagnosisResult.conditions?.map((cond, idx) => (
-                        <div key={idx} className="flex flex-col gap-1">
-                          <div className="flex justify-between text-xs font-semibold mb-0.5">
-                            <span className="text-slate-700 font-bold">{cond.name}</span>
-                            <span className="text-slate-800 font-bold">{cond.probability}</span>
+                        <div key={idx} className="condition-row">
+                          <div className="condition-header">
+                            <span className="condition-name">{cond.name}</span>
+                            <span className="condition-prob">{cond.probability}</span>
                           </div>
-                          <div className="w-full bg-slate-100 rounded-full h-1.5">
+                          <div className="condition-bar-bg">
                             <div 
-                              className="bg-black h-1.5 rounded-full" 
+                              className="condition-bar-fill" 
                               style={{ width: String(cond.probability).includes('%') ? String(cond.probability) : `${cond.probability}%` }}
                             ></div>
                           </div>
@@ -445,86 +367,87 @@ const AiDiagnosis = () => {
                       ))}
                     </div>
 
-                    {/* Suggested laboratory tests */}
                     {diagnosisResult.suggestedTests?.length > 0 && (
-                      <div className="border-t border-slate-100 pt-4 flex flex-col gap-2">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Suggested Laboratory Panels</span>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="suggested-tests">
+                        <span className="clinical-notes-label">Suggested Tests</span>
+                        <div className="test-badges">
                           {diagnosisResult.suggestedTests.map((test, index) => (
-                            <div key={index} className="flex items-center gap-2 bg-slate-50 p-2.5 rounded-xl">
-                              <CheckCircle className="text-emerald-500 shrink-0" size={13} />
-                              <span className="text-[11px] text-slate-700 font-semibold">{test}</span>
-                            </div>
+                            <span key={index} className="test-badge">
+                              <CheckCircle size={12} style={{ color: 'var(--primary)' }} />
+                              {test}
+                            </span>
                           ))}
                         </div>
                       </div>
                     )}
-                  </div>
+                  </motion.div>
                 ) : (
-                  <div className="text-center py-12 text-xs text-slate-400">
-                    Select symptoms on the left and click "Diagnose Symptoms" to get instant differentials.
-                  </div>
+                  <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                    <p className="placeholder-text">Configure patient and symptoms to run differential.</p>
+                  </motion.div>
                 )}
-              </>
-            )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Simple Prescription Card */}
-          <div className="card rounded-2xl p-6 flex flex-col gap-4 shadow-sm" style={{ border: 'none' }}>
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2">Active Prescribed Medications</h3>
+          <div className="ai-card">
+            <div className="ai-card-header">
+              <h3 className="ai-card-title">Rx Builder</h3>
+              {prescriptionList.length > 0 && (
+                <span className="test-badge">{prescriptionList.length} items</span>
+              )}
+            </div>
             
-            <div className="flex flex-col gap-2">
+            <div className="rx-list">
               {prescriptionList.map((presc, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-                  <div>
-                    <h4 className="text-xs font-bold text-slate-800">{presc.name}</h4>
-                    <p className="text-[10px] text-slate-500 font-semibold mt-0.5">{presc.dosage}</p>
+                <div key={idx} className="rx-item">
+                  <div className="rx-item-info">
+                    <span className="rx-item-name">{presc.name}</span>
+                    <span className="rx-item-dosage">{presc.dosage}</span>
                   </div>
-                  <button onClick={() => removePrescription(idx)} className="text-slate-400 hover:text-red-600 transition-colors">
-                    <Trash2 size={13} />
+                  <button onClick={() => removePrescription(idx)} className="rx-delete-btn">
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-2 mt-2">
+            <div className="rx-add-row">
               <input 
                 type="text" 
-                className="bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none flex-1"
+                className="rx-input"
                 placeholder="Medication name..."
                 value={newPrescName}
                 onChange={(e) => setNewPrescName(e.target.value)}
               />
-              <div className="flex gap-2 flex-1">
-                <input 
-                  type="text" 
-                  className="bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold text-slate-800 focus:outline-none flex-1"
-                  placeholder="Dosage instruction..."
-                  value={newPrescDosage}
-                  onChange={(e) => setNewPrescDosage(e.target.value)}
-                />
-                <button onClick={addPrescription} className="bg-black hover:bg-slate-800 text-white p-2.5 rounded-xl shrink-0">
-                  <Plus size={15} />
-                </button>
-              </div>
+              <input 
+                type="text" 
+                className="rx-input"
+                placeholder="Dosage..."
+                value={newPrescDosage}
+                onChange={(e) => setNewPrescDosage(e.target.value)}
+              />
+              <button onClick={addPrescription} className="rx-add-btn">
+                <Plus size={14} />
+              </button>
             </div>
 
             {prescriptionList.length > 0 && (
               <button 
                 onClick={handleSavePrescription}
                 disabled={isSaving}
-                className="bg-[#c8f17a] hover:bg-[#b5dc64] text-black font-bold text-xs px-5 py-3 rounded-xl flex items-center justify-center gap-2 transition-all mt-3 w-full shadow-sm"
+                className="btn btn-primary"
+                style={{ width: '100%', marginTop: '0.5rem' }}
               >
-                <CheckCircle size={15} />
-                <span>{isSaving ? 'Saving to Database...' : 'Save Digital Prescription to MongoDB'}</span>
+                <CheckCircle size={14} />
+                {isSaving ? 'Saving...' : 'Save Prescription'}
               </button>
             )}
           </div>
 
         </div>
-
       </div>
-      {/* Pricing Modal Overlay */}
       <PricingModal isOpen={isPricingOpen} onClose={() => setIsPricingOpen(false)} />
     </motion.div>
   );

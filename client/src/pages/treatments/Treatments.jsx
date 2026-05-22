@@ -169,12 +169,12 @@ const Treatments = () => {
     <motion.div 
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="treatments-container h-full"
+      className="treatments-container"
     >
-      <div className="flex justify-between items-center mb-6">
+      <div className="treatments-header">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Treatments & Prescriptions</h1>
-          <p className="text-muted text-sm mt-1">Generate digital prescriptions and explain medicines using Clinical AI.</p>
+          <h1 className="text-xl font-bold text-slate-800" style={{ fontFamily: 'var(--font-heading)', margin: 0, lineHeight: 1.2 }}>Treatments & Prescriptions</h1>
+          <p className="text-muted" style={{ fontSize: '0.6875rem', margin: '0.25rem 0 0 0' }}>Generate digital prescriptions and explain medicines using Clinical AI.</p>
         </div>
         
         <button className="btn btn-primary flex items-center gap-2" onClick={() => setIsCreateOpen(true)}>
@@ -232,7 +232,7 @@ const Treatments = () => {
         </div>
 
         {/* Right Side: Active Prescription Details Viewer */}
-        <div className="prescription-viewer card border-0">
+        <div className="prescription-viewer">
           {activePrescription ? (
             <div className="flex flex-col h-full justify-between">
               <div>

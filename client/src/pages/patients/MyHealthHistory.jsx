@@ -101,117 +101,15 @@ const MyHealthHistory = () => {
     <motion.div 
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-6 md:p-8 max-w-[1600px] mx-auto min-h-screen flex flex-col gap-6"
+      className="p-6 md:p-8 max-w-[1000px] mx-auto min-h-screen flex flex-col gap-6"
     >
-      {/* Welcome Hero Section */}
-      <section className="relative rounded-[2rem] overflow-hidden bg-slate-50 border border-slate-200/60 p-8 md:p-12 flex flex-col md:flex-row items-center gap-8 shadow-sm">
-        {/* Decorative Background Element */}
-        <div className="absolute -right-20 -top-20 w-96 h-96 bg-[#c8f17a]/20 rounded-full blur-3xl pointer-events-none"></div>
-        
-        <div className="flex-1 relative z-10 space-y-4">
-          <h2 className="font-headline-xl text-3xl md:text-4xl font-bold text-slate-900 max-w-xl">
-            Good morning, {firstName}. Your health is optimal today.
-          </h2>
-          <p className="text-slate-500 text-sm max-w-lg leading-relaxed font-body-md">
-            All recent test results are within normal ranges. Keep up the good work maintaining your wellness routine.
-          </p>
-          <div className="flex flex-wrap gap-3 pt-2">
-            <span className="bg-white border border-slate-200 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 text-slate-700 shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-[#c8f17a]"></span> Health Score: 92/100
-            </span>
-            <span className="bg-white border border-slate-200 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 text-slate-700 shadow-sm">
-              <Activity className="text-emerald-600" size={14} /> Vitals Stable
-            </span>
-          </div>
-        </div>
+      <div className="flex flex-col gap-2 mb-2">
+        <h1 className="font-headline-xl text-2xl font-bold text-slate-900">Clinical Records & Prescriptions</h1>
+        <p className="text-slate-500 text-sm font-semibold">View and analyze your past prescriptions using AI insights.</p>
+      </div>
 
-        <div className="w-full md:w-1/3 aspect-square max-w-[240px] rounded-[2rem] overflow-hidden relative border border-slate-200 shadow-sm">
-          <img 
-            alt="Wellness Banner Illustration" 
-            className="w-full h-full object-cover" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYnnJ4rMhnER3dFNz3INGaEg4klciq1cYU7XwtqBSx60g4Z177m3-h4nwzBAy61QxIkue_DWSMQ3wOrVdwvCdTINgk7KHGPWOxXf8jVpF7Q_gju52RspO3w8IARSX6P9AYpYqJh3UxhAb44Hq7w2IuXt6OBfh_8I8exi5fZ83dxcdTSnn1oBzod2Rofx3cDdrMVhJ9wN-3oolBwvwUeWXsH_9K0Jn9_Z5LspktE3T2gCw52jtUSMKoElK6NtK1EzdPAg5mmT3vjOY"
-          />
-          {/* Floating tag */}
-          <div className="absolute bottom-4 left-4 right-4 bg-white/80 backdrop-blur-md rounded-xl p-3 border border-slate-200/40 flex items-center justify-between shadow-sm">
-            <span className="text-[10px] font-bold text-slate-700">Wellness Status</span>
-            <div className="w-5 h-5 rounded-full bg-[#daee13] flex items-center justify-center text-black font-bold text-xs">
-              ✓
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Bento Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        
-        {/* Left Column: Appointments & Actions (Span 7) */}
-        <div className="md:col-span-7 flex flex-col gap-6">
-          {/* Appointment Timeline */}
-          <div className="glass-panel rounded-2xl p-6 flex flex-col shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-bold text-slate-900 text-sm">Upcoming Appointments</h3>
-            </div>
-            
-            <div className="space-y-6 relative before:absolute before:inset-0 before:ml-[1.2rem] before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-200">
-              {appointments.length > 0 ? (
-                appointments.map((apt, index) => (
-                  <div key={apt._id || index} className="relative flex gap-6 items-start group">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-black text-white shadow shrink-0 z-10">
-                      <Calendar size={16} />
-                    </div>
-                    <div className="bg-white border border-slate-200/60 p-4 rounded-xl shadow-sm flex-1">
-                      <div className="flex justify-between items-start mb-1">
-                        <h4 className="font-bold text-slate-800 text-sm">{apt.reason || 'General Consultation'}</h4>
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded capitalize ${
-                          apt.status === 'scheduled' || apt.status === 'confirmed' ? 'bg-[#c8f17a] text-slate-800' : 'bg-slate-100 text-slate-500'
-                        }`}>
-                          {apt.status}
-                        </span>
-                      </div>
-                      <p className="text-slate-400 text-xs font-semibold mb-2">
-                        {apt.doctorId?.name || 'Dr. Sarah Ahmed'} • {apt.doctorId?.specialization || 'Clinical Doctor'}
-                      </p>
-                      <div className="flex items-center gap-2 text-slate-400 text-xs font-semibold">
-                        <Clock size={12} />
-                        <span>{new Date(apt.date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="relative flex gap-6 items-start group opacity-70">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-slate-200 text-slate-500 shadow shrink-0 z-10">
-                    <Calendar size={16} />
-                  </div>
-                  <div className="bg-white border border-slate-200/40 p-4 rounded-xl shadow-sm flex-1">
-                    <h4 className="font-bold text-slate-800 text-sm mb-1">No Scheduled Appointments</h4>
-                    <p className="text-slate-400 text-xs font-semibold">Please book a slot from the Appointments panel when required.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Quick Actions Chips */}
-          <div className="flex flex-wrap gap-3">
-            <button className="bg-white hover:bg-slate-50 border border-slate-200 px-5 py-3 rounded-full flex items-center gap-2 text-xs font-bold text-slate-800 transition-all shadow-sm">
-              <RefreshCw size={14} className="text-emerald-600" />
-              <span>Request Refill</span>
-            </button>
-            <button className="bg-white hover:bg-slate-50 border border-slate-200 px-5 py-3 rounded-full flex items-center gap-2 text-xs font-bold text-slate-800 transition-all shadow-sm">
-              <MessageSquare size={14} className="text-emerald-600" />
-              <span>Message Doctor</span>
-            </button>
-            <button className="bg-white hover:bg-slate-50 border border-slate-200 px-5 py-3 rounded-full flex items-center gap-2 text-xs font-bold text-slate-800 transition-all shadow-sm">
-              <DollarSign size={14} className="text-emerald-600" />
-              <span>Pay Bill</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Right Column: AI Prescription Summary Highlight (Span 5) */}
-        <div className="md:col-span-5 flex flex-col gap-6">
-          <div className="glass-panel rounded-2xl p-1 relative overflow-hidden shadow-sm flex flex-col h-full">
+      <div className="w-full flex flex-col gap-6">
+        <div className="glass-panel rounded-2xl p-1 relative overflow-hidden shadow-sm flex flex-col h-full min-h-[500px]">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-black to-[#c8f17a]"></div>
             
             <div className="p-6 flex-1 flex flex-col gap-4">
@@ -269,7 +167,7 @@ const MyHealthHistory = () => {
                   {/* AI Explanation Drawer/Well */}
                   {explaining && (
                     <div className="bg-slate-50 border border-slate-200/60 rounded-xl p-4 flex items-center justify-center gap-3">
-                      <Brain className="animate-pulse text-emerald-600" size={16} />
+                      <Brain className="animate-pulse text-[#496800]" size={16} />
                       <span className="text-xs font-semibold text-slate-600">AI Explaining Prescription...</span>
                     </div>
                   )}
@@ -278,9 +176,9 @@ const MyHealthHistory = () => {
                     <motion.div 
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-emerald-50/50 border border-emerald-100 rounded-xl p-4 mt-2 max-h-[220px] overflow-y-auto"
+                      className="bg-[#add461]/10 border border-[#add461]/30 rounded-xl p-4 mt-2 max-h-[220px] overflow-y-auto"
                     >
-                      <h4 className="text-[10px] font-bold text-emerald-800 mb-2 flex items-center gap-2 uppercase tracking-wider">
+                      <h4 className="text-[10px] font-bold text-[#496800] mb-2 flex items-center gap-2 uppercase tracking-wider">
                         <Brain size={12} /> AI Clinical Insights
                       </h4>
                       <div className="text-xs font-semibold text-slate-600 leading-relaxed whitespace-pre-wrap">
@@ -316,8 +214,6 @@ const MyHealthHistory = () => {
               )}
             </div>
           </div>
-        </div>
-
       </div>
     </motion.div>
   );

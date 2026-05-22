@@ -1,191 +1,415 @@
 /* ──────────────────────────────────────────────
-   Patients.css — Overhauled Premium Stitch Layout
+   Patients.css — Clinical EHR layout, production-grade
+   Matching Linear/Vercel design density.
    ────────────────────────────────────────────── */
 
 :root {
-  --stitch-primary: #000000;
+  --stitch-primary: #09090b;
   --stitch-secondary: #496800;
   --stitch-secondary-light: #c8f17a;
-  --stitch-background: #f9f9f9;
-  --stitch-surface: #ffffff;
-  --stitch-surface-container: #eeeeee;
-  --stitch-surface-container-high: #e8e8e8;
-  --stitch-surface-container-low: #f3f3f4;
-  --stitch-outline-variant: rgba(196, 199, 199, 0.3);
-  --stitch-font-headline: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --stitch-font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+  --stitch-background: var(--bg);
+  --stitch-surface: var(--surface);
+  --stitch-surface-container: var(--surface-3);
+  --stitch-surface-container-high: var(--neutral-200);
+  --stitch-surface-container-low: var(--surface-2);
+  --stitch-outline-variant: var(--border);
+  --stitch-font-headline: var(--font-heading);
+  --stitch-font-body: var(--font-sans);
 }
 
+/* ─── Module shell ─── */
 .patient-module {
   display: flex;
-  gap: 1.5rem;
-  height: calc(100vh - 120px);
-  padding: 0.25rem 0;
-  font-family: var(--stitch-font-body);
-  background-color: var(--stitch-background);
+  gap: 1rem;
+  height: calc(100vh - var(--header-h) - 2.5rem);
+  padding: 0;
+  font-family: var(--font-sans);
+  background-color: var(--bg);
 }
 
-/* Glass panel background */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-}
-
-/* Master Sidebar Drawer */
+/* ─── Sidebar drawer ─── */
 .patient-list-sidebar {
-  width: 320px;
+  width: 260px;
   display: flex;
   flex-direction: column;
-  background: var(--stitch-surface);
-  border-radius: 24px;
-  border: 2px solid var(--stitch-secondary-light) !important;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .search-bar-small {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: border-color var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
 }
 
 .search-bar-small:focus-within {
-  border-color: var(--stitch-secondary) !important;
-  background: #ffffff !important;
-  box-shadow: 0 0 0 3px rgba(73, 104, 0, 0.08);
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px var(--primary-ring) !important;
 }
 
 .patients-scroll-list {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.05) transparent;
+  scrollbar-color: var(--neutral-200) transparent;
 }
 
-.patients-scroll-list::-webkit-scrollbar {
-  width: 4px;
-}
-
+.patients-scroll-list::-webkit-scrollbar { width: 4px; }
 .patients-scroll-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--neutral-200);
   border-radius: 4px;
 }
 
-/* Patient List Card Items */
+/* Patient list items */
 .patient-list-item {
   border: 1px solid transparent !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out);
+  border-radius: var(--r-md);
 }
 
 .patient-list-item:hover {
-  background-color: var(--stitch-surface-container-low) !important;
-  transform: translateY(-0.5px);
+  background-color: var(--surface-2) !important;
+  border-color: var(--border) !important;
 }
 
-/* Stitch Selected state */
 .patient-list-item.patient-selected {
-  background-color: var(--stitch-surface-container-high) !important;
-  border-color: rgba(0, 0, 0, 0.04) !important;
+  background-color: var(--surface-3) !important;
+  border-color: var(--border-hover) !important;
 }
 
 .patient-list-item.patient-selected h4 {
   font-weight: 700;
-  color: var(--stitch-primary) !important;
+  color: var(--text-primary) !important;
 }
 
-/* Right Detail longitudinal workspace */
+/* ─── Right workspace ─── */
 .patient-details-area {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-width: 0;
 }
 
 .patient-hero-banner {
-  border: 1px solid var(--stitch-outline-variant) !important;
-  box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.01) !important;
-  background: var(--stitch-surface);
-  border-radius: 24px;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-xs) !important;
+  background: var(--surface);
+  border-radius: var(--r-xl);
 }
 
 .patient-hero-banner h2 {
-  font-family: var(--stitch-font-headline);
-  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
+  letter-spacing: -0.025em;
 }
 
-/* Tabs Section */
+/* ─── Tabs ─── */
 .patient-tabs-row .tab {
   background: transparent;
   outline: none;
-  font-family: var(--stitch-font-headline);
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
   border-bottom: 2px solid transparent;
-  transition: all 0.2s ease;
+  transition: color var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out);
+  color: var(--text-muted);
+  padding-bottom: 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.patient-tabs-row .tab:hover {
+  color: var(--text-secondary);
 }
 
 .patient-tabs-row .tab.active {
-  color: var(--stitch-primary) !important;
-  border-bottom-color: var(--stitch-primary) !important;
-  font-weight: 700;
+  color: var(--text-primary) !important;
+  border-bottom-color: var(--text-primary) !important;
+  font-weight: 600;
 }
 
-/* Vitals Cards overrides */
+/* ─── Vitals cards ─── */
 .vitals-grid-card {
-  transition: all 0.2s ease;
-  border: 1px solid var(--stitch-outline-variant);
+  transition: border-color var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+  border: 1px solid var(--border);
 }
 
 .vitals-grid-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-xs);
 }
 
-/* Diagnostic Scans with blend-mode screen overlay */
+/* ─── Diagnostic scan boxes ─── */
 .scan-img-box {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.02);
+  transition: opacity var(--t-base) var(--ease-out);
   background-color: #000000;
-  border-radius: 12px;
+  border-radius: var(--r-lg);
   overflow: hidden;
+  border: 1px solid var(--border);
 }
 
 .scan-img-box img {
   mix-blend-mode: screen;
-  opacity: 0.8;
-  transition: all 0.3s ease;
+  opacity: 0.75;
+  transition: opacity var(--t-base) var(--ease-out),
+              transform var(--t-base) var(--ease-out);
 }
 
 .scan-img-box:hover img {
-  opacity: 1.0;
-  transform: scale(1.03);
+  opacity: 1;
+  transform: scale(1.02);
 }
 
 .scan-img-box.empty {
-  border: 2px dashed rgba(0, 0, 0, 0.15) !important;
-  transition: all 0.2s ease;
+  border: 1.5px dashed var(--border-hover) !important;
+  transition: border-color var(--t-fast), background var(--t-fast);
 }
 
 .scan-img-box.empty:hover {
-  background: var(--stitch-surface-container-low);
-  border-color: var(--stitch-secondary) !important;
-  color: var(--stitch-primary);
+  background: var(--surface-2);
+  border-color: var(--border-focus) !important;
 }
 
-/* Dynamic AI Conditions Differential Progress */
+/* ─── AI diagnosis panel ─── */
 .ai-diagnosis-result-area {
-  animation: fadeIn 0.3s ease-out;
+  animation: fadeSlideUp 200ms var(--ease-out) both;
 }
 
-@keyframes fadeIn {
+@keyframes fadeSlideUp {
   from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Pro pricing promotional widget */
+/* ─── Breadcrumb nav ─── */
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.breadcrumb-nav button {
+  transition: background var(--t-fast) var(--ease-out),
+              color var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out);
+}
+
+.breadcrumb-nav button:hover {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+}
+
+.breadcrumb-nav span {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+/* ─── EHR Overview grid (custom, not Tailwind CDN) ─── */
+.ehr-overview-grid {
+  display: grid;
+  grid-template-columns: 5fr 7fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .ehr-overview-grid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+}
+
+.vitals-full-width {
+  grid-column: span 2;
+}
+
+@media (max-width: 1200px) {
+  .vitals-full-width { grid-column: span 1; }
+}
+
+/* ─── Patient directory table ─── */
+.patient-directory-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+}
+
+.patient-directory-table th {
+  padding: 0.625rem 1rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background-color: var(--surface-2);
+  white-space: nowrap;
+}
+
+.patient-directory-table th:first-child { border-radius: var(--r-lg) 0 0 0; }
+.patient-directory-table th:last-child  { border-radius: 0 var(--r-lg) 0 0; }
+
+.patient-directory-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  transition: background var(--t-fast) var(--ease-out);
+}
+
+.patient-directory-table tbody tr {
+  transition: background var(--t-fast) var(--ease-out);
+}
+
+.patient-directory-table tbody tr:hover td {
+  background-color: var(--surface-2);
+}
+
+.patient-directory-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Avatar in table */
+.patient-directory-table .avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.patient-directory-table .avatar-img {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--t-fast);
+}
+
+.patient-directory-table tbody tr:hover .avatar-img {
+  border-color: var(--border-hover);
+}
+
+/* Allergy badge */
+.patient-directory-table .allergy-badge {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background-color: var(--surface-3);
+  border: 1px solid var(--border);
+  padding: 0.1875rem 0.4375rem;
+  border-radius: var(--r-sm);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* EHR action button */
+.patient-directory-table .btn-open-ehr {
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--r-md);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.75rem;
+  transition: background var(--t-fast) var(--ease-out),
+              color var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.patient-directory-table tbody tr:hover .btn-open-ehr {
+  background-color: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── Minimalist vitals cards ─── */
+.vitals-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.625rem;
+}
+
+@media (max-width: 1024px) {
+  .vitals-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 768px) {
+  .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+.minimalist-vitals-card {
+  background: var(--surface);
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-lg);
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-xs);
+  transition: border-color var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out);
+}
+
+.minimalist-vitals-card:hover {
+  border-color: var(--border-hover) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.minimalist-vitals-card .value {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 1.375rem;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.minimalist-vitals-card .unit {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 0.125rem;
+}
+
+.minimalist-vitals-card .label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.minimalist-vitals-card .normal-range {
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* ─── Pro plan promo widget ─── */
 .pro-plan-promo-widget {
-  background: var(--stitch-surface-container);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 16px;
-  transition: all 0.2s ease;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  transition: border-color var(--t-base) var(--ease-out);
 }
 
 .pro-plan-promo-widget:hover {
-  background: var(--stitch-surface-container-high);
+  border-color: var(--border-hover);
 }

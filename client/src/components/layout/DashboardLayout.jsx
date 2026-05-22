@@ -1,43 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Header from './Header';
 import StartupModal from '../common/StartupModal';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 6 },
+  in:      { opacity: 1, y: 0 },
+  out:     { opacity: 0, y: -4 },
+};
+
+const pageTransition = {
+  duration: 0.2,
+  ease: [0.16, 1, 0.3, 1],
+};
 
 const DashboardLayout = () => {
   const location = useLocation();
   const [isStartupOpen, setIsStartupOpen] = useState(false);
 
   useEffect(() => {
-    // Show startup onboarding modal once per user session
     const hasSeenStartup = sessionStorage.getItem('saylani_seen_startup');
     if (!hasSeenStartup) {
       setIsStartupOpen(true);
       sessionStorage.setItem('saylani_seen_startup', 'true');
     }
   }, []);
-  
-  // Basic logic to get title from path
-  const getPageTitle = () => {
-    const path = location.pathname.split('/')[1];
-    if (!path) return 'Dashboard';
-    return path.charAt(0).toUpperCase() + path.slice(1);
-  };
 
   return (
     <div className="app-container">
       <Sidebar />
       <main className="main-content">
-        <Header title={getPageTitle()} />
-        <div className="page-wrapper">
-          <Outlet />
-        </div>
+        <Header />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            className="page-wrapper"
+            variants={pageVariants}
+            initial="initial"
+            animate="in"
+            exit="out"
+            transition={pageTransition}
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
-      {/* Flagship Startup Modal */}
-      <StartupModal 
-        isOpen={isStartupOpen} 
-        onClose={() => setIsStartupOpen(false)} 
+      <StartupModal
+        isOpen={isStartupOpen}
+        onClose={() => setIsStartupOpen(false)}
       />
     </div>
   );

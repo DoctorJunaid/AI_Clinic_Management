@@ -100,14 +100,14 @@ const Reports = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Card 1 */}
         <div className="glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:bg-white/95 transition-all shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity z-0 pointer-events-none">
             <Users size={64} className="text-black" />
           </div>
-          <div>
+          <div className="relative z-10">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Patients</p>
             <h2 className="text-3xl font-semibold text-slate-900">{stats.totalPatients.toLocaleString()}</h2>
           </div>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2 relative z-10">
             <div className="bg-secondary-container text-on-secondary-container rounded-full px-2.5 py-0.5 text-[10px] font-bold flex items-center gap-0.5">
               <TrendingUp size={10} />
               <span>14%</span>
@@ -118,14 +118,14 @@ const Reports = () => {
 
         {/* Card 2 */}
         <div className="glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:bg-white/95 transition-all shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity z-0 pointer-events-none">
             <Activity size={64} className="text-black" />
           </div>
-          <div>
+          <div className="relative z-10">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Active Doctors</p>
             <h2 className="text-3xl font-semibold text-slate-900">{stats.activeDoctors}</h2>
           </div>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2 relative z-10">
             <div className="bg-slate-100 text-slate-600 rounded-full px-2.5 py-0.5 text-[10px] font-bold">
               <span>Stable</span>
             </div>
@@ -135,14 +135,14 @@ const Reports = () => {
 
         {/* Card 3 */}
         <div className="glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:bg-white/95 transition-all shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity z-0 pointer-events-none">
             <TrendingUp size={64} className="text-black" />
           </div>
-          <div>
+          <div className="relative z-10">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Monthly Revenue</p>
             <h2 className="text-3xl font-semibold text-slate-900">{stats.monthlyRevenue}</h2>
           </div>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2 relative z-10">
             <div className="bg-secondary-container text-on-secondary-container rounded-full px-2.5 py-0.5 text-[10px] font-bold flex items-center gap-0.5">
               <TrendingUp size={10} />
               <span>8.2%</span>
@@ -153,14 +153,14 @@ const Reports = () => {
 
         {/* Card 4 */}
         <div className="glass-panel rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden group hover:bg-white/95 transition-all shadow-sm">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity z-0 pointer-events-none">
             <BarChart3 size={64} className="text-black" />
           </div>
-          <div>
+          <div className="relative z-10 pr-12">
             <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Top Service</p>
-            <h2 className="text-2xl font-semibold text-slate-900 mt-1">{stats.topService}</h2>
+            <h2 className="text-2xl font-semibold text-slate-900 mt-1 leading-tight">{stats.topService}</h2>
           </div>
-          <div className="mt-4 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2 relative z-10">
             <span className="text-[10px] font-bold text-slate-800">3,204 visits</span>
             <span className="text-[10px] font-bold text-slate-400">(25% of total)</span>
           </div>
@@ -265,16 +265,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* Floating Insight Detected Box */}
-      <div className="bg-white/95 backdrop-blur-xl border border-[#daee13]/60 shadow-xl rounded-2xl p-4 max-w-sm flex gap-4 items-start self-end z-30 transform hover:-translate-y-0.5 transition-transform mt-4">
-        <div className="bg-[#daee13] text-black w-8 h-8 rounded-full flex items-center justify-center shrink-0">
-          <Brain size={18} />
-        </div>
-        <div>
-          <h4 className="text-xs font-bold text-slate-800 mb-1">Insight Detected</h4>
-          <p className="text-[11px] text-slate-600 leading-relaxed">Cardiology appointments are up 12% this week. Consider reallocating support staff from General Practice for the upcoming weekend shift.</p>
-        </div>
-      </div>
+
     </motion.div>
   );
 };
