@@ -9,8 +9,7 @@
 
 > A modern, AI-powered Clinic Management SaaS platform that digitizes clinic operations, improves efficiency, and provides intelligent AI-assisted diagnosis for doctors and patients.
 
-**Live Demo:** [https://medflow-ai.vercel.app](https://medflow-ai.vercel.app)  
-**Demo Video:** [YouTube / LinkedIn Demo](#)
+)
 
 ---
 
